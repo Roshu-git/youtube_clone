@@ -3,8 +3,20 @@ import { User } from 'lucide-react';
 import {Link} from 'react-router-dom';
 import logo from '../../public/images/logo.svg';
 import { Search } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function Header({toggleSidebar, search, setSearch}) {
+     const navigate = useNavigate();
+    
+    const { user, logout } = useAuth();
+    // console.log("AUTH:", auth);
+//   const user = JSON.parse(
+//     localStorage.getItem("user")
+//   );
+
+  const token = localStorage.getItem("token");
+
   return (
     <header className='vc-header'>
         <div className='vc-headlogo flex flex-row items-center gap-3'>
@@ -25,11 +37,40 @@ function Header({toggleSidebar, search, setSearch}) {
                 <Search size={22} className="text-black" /> 
             </button>
         </div>
-        <div className='vc-profile'>
+
+        <div className='vc-profile flex gap-2 items-center'>
             <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center"> 
                 <User size={22} className="text-gray-700" /> 
             </div>
-        </div>
+            <div className='vc-signin-btn'>
+                {/* <div className="header-right"> */}
+
+            {/* {token && user ? ( */}
+            {user ? (
+                <>
+            {/* // User is logged in */}
+            <div className="header-user">
+                {user.username}
+            </div>
+            <button onClick={logout}>
+                Logout
+              </button>
+            </>
+
+            ) : (
+                // User is NOT logged in
+            <button
+                className="signin-button"
+                onClick={() => navigate("/signin")}
+            >
+                Sign in
+            </button>
+
+            )}
+            </div>
+</div>
+            {/* logout */}
+           
     </header>
   )
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const filters = ['All', 'React', 'javascript', 'menubar', 'CSS' , 'Node.js'];
+const filters = ['All', 'React', 'javascript', 'MERN', 'CSS' , 'Node.js'];
 // function FilterBar() {
     const FilterBar = ({category, setCategory}) =>{
         return (

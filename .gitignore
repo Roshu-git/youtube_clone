@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+adlakroshani_db_user
+QjILAk6y1im5iQvT
+
+
+mongodb+srv://adlakroshani_db_user:QjILAk6y1im5iQvT@cluster0.eymfqop.mongodb.net/?appName=Cluster0

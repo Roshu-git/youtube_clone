@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import "./style.css";
-// import Header from './Components/Header.jsx';
 import Header from './Components/Header.jsx';
 import Sidebar from './Components/Sidebar.jsx';
 import Home from './pages/Home.jsx';
 import VideoPlayer from './pages/VideoPlayer.jsx';
 import { Routes, Route } from 'react-router-dom';
+import SignIn from "./pages/SignIn";
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -27,6 +27,7 @@ function App() {
           {/* <Home isSidebarOpen={isSidebarOpen} search={search} /> */}
           <Routes>
             <Route path="/" element={<Home isSidebarOpen={isSidebarOpen} search={search} /> } />
+            <Route path="/signin" element={<SignIn />} />
           <Route path="/watch/:id" element={<VideoPlayer isSidebarOpen={isSidebarOpen} />} />
           </Routes>
         </div>
