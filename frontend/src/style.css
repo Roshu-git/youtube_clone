@@ -3,102 +3,115 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 /* Common CSS Start */
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: "Nunito", sans-serif;
     box-shadow: none;
 }
+
 *,
 *::before,
 *::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-shadow: none;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-shadow: none;
 }
 
 body {
-  font-family: "Nunito", sans-serif;
-  line-height: 1.5;
-  background-color: #F5F9FF;
-  background-image: url('../public/images/bannerBg.png');
-  box-shadow: none;
-  font-size: 16px;
-  font-weight: 400;
+    font-family: "Nunito", sans-serif;
+    line-height: 1.5;
+    background-color: #F5F9FF;
+    background-image: url('../public/images/bannerBg.png');
+    background-repeat: no-repeat;
+    background-size: auto;
+    box-shadow: none;
+    font-size: 16px;
+    font-weight: 400;
 }
-h1, h2, h3,h4, h5{
+
+h1,
+h2,
+h3,
+h4,
+h5 {
     line-height: 1.3;
     margin: 0;
     padding: 0;
     font-family: "Nunito", sans-serif;
 }
+
 ul,
 p {
-  margin: 0;
-  padding: 0;
-  font-size: 16px;
-  font-weight: 400;
-  font-family: "Nunito", sans-serif;
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+    font-weight: 400;
+    font-family: "Nunito", sans-serif;
 }
 
 span {
-  font-family: "Nunito", sans-serif;
+    font-family: "Nunito", sans-serif;
 }
 
 ul li {
-  list-style-type: none;
+    list-style-type: none;
 }
 
 a {
-  text-decoration: none;
-  font-family: "Nunito", sans-serif;
+    text-decoration: none;
+    font-family: "Nunito", sans-serif;
 }
 
 .form-control:focus {
-  box-shadow: none;
+    box-shadow: none;
 }
 
 input:focus-visible {
-  outline: none;
+    outline: none;
 }
 
 .form-control:focus {
-  box-shadow: none;
-  border-color: transparent;
+    box-shadow: none;
+    border-color: transparent;
 }
 
 img {
-  max-width: 100%;
+    max-width: 100%;
 }
+
 :focus-visible {
-  outline: none;
-  border-color: transparent;
+    outline: none;
+    border-color: transparent;
 }
 
 /* Scroll */
 ::-webkit-scrollbar {
-  width: 8px;
-} 
+    width: 8px;
+}
+
 ::-webkit-scrollbar-track {
-  background-color: #fff;
-  -webkit-border-radius: 10px;    
-  border-radius: 10px;
+    background-color: #fff;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
 }
+
 ::-webkit-scrollbar-thumb {
-  -webkit-border-radius: 10px;
-  border-radius: 10px;
-  height: 100px;
-  background-color: #217BFF;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    height: 100px;
+    background-color: #217BFF;
 }
+
 /* Scroll */
 
 /* Common CSS End */
 /* Header CSS Start */
-.vc-header{
+.vc-header {
     /* position: relative; */
     display: flex;
     align-items: center;
@@ -110,6 +123,7 @@ img {
     right: 0;
     background-color: #f8f9fa;
 }
+
 .vc-humburger {
     display: block;
     background: none;
@@ -117,7 +131,8 @@ img {
     color: #000;
     cursor: pointer;
 }
-.vc-humburger span{
+
+.vc-humburger span {
     width: 20px;
     height: 2px;
     display: block;
@@ -126,40 +141,47 @@ img {
     transition: all .3s ease-in-out;
 
 }
+
 .vc-search {
     max-width: 560px;
-    width: 100%;position: relative;
-}
-.Search-bar{
-    max-width: 600px; 
     width: 100%;
-    padding: 8px 55px 8px 15px; 
-    border-radius: 20px; 
-    border: 1px solid #dce7f6; 
-    background: #e3e7fb; 
+    position: relative;
+}
+
+.Search-bar {
+    max-width: 600px;
+    width: 100%;
+    padding: 8px 55px 8px 15px;
+    border-radius: 20px;
+    border: 1px solid #dce7f6;
+    background: #e3e7fb;
     color: #26325E;
     position: relative;
 }
+
 .search-btn {
     position: absolute;
     right: 0;
     top: 0;
     padding: 9px 13px;
 }
+
 .search-btn:hover {
     background-color: #217BFF;
 }
-.vc-mainlayout{
+
+.vc-mainlayout {
     display: flex;
-/* display: flex; hei
+    /* display: flex; hei
 ght: calc(100vh - 64px); margin-top: 64px; */
 }
-.vc-sidebar{
-    width: 240px; 
-    background: #f8f9fa; 
+
+.vc-sidebar {
+    width: 240px;
+    background: #f8f9fa;
     /* min-height: 100vh;  */
-    padding: 20px 15px 15px ; 
-    transition: 0.3s; 
+    padding: 20px 15px 15px;
+    transition: 0.3s;
     position: fixed;
     top: 64px;
     left: 0;
@@ -167,105 +189,139 @@ ght: calc(100vh - 64px); margin-top: 64px; */
     overflow-y: auto;
 
 }
-.vc-sidebar.close{
+
+.vc-sidebar.close {
     width: 72px;
 }
-/* Center icons when sidebar is closed */ 
-.vc-sidebar.close .vc-navmenu a{ 
-    justify-content: center; 
-} 
-/* Hide text when sidebar is closed */ 
-.vc-sidebar.close .menu-text{ 
-    display: none; 
+
+/* Center icons when sidebar is closed */
+.vc-sidebar.close .vc-navmenu a {
+    justify-content: center;
 }
-.vc-navmenu ul{
+
+/* Hide text when sidebar is closed */
+.vc-sidebar.close .menu-text {
+    display: none;
+}
+
+.vc-navmenu ul {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
-.vc-sidebar .vc-navmenu li a{
+
+.vc-sidebar .vc-navmenu li a {
     margin: 20px 0;
     cursor: pointer;
 }
-.vc-main{
-    flex: 1; 
+
+.vc-main {
+    flex: 1;
     /* height: 100vh;
     overflow: hidden; */
     /* padding: 20px; */
 }
-.vc-filterbar { 
-    display: flex; 
+
+.vc-filterbar {
+    display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px; 
-    margin-bottom: 20px; 
-    overflow-x: auto; 
-} 
-.vc-filterbtn { 
-    background: #f2f2f2; 
-    color: #4b4b4b;
-    border: none; 
-    padding: 8px 35px; 
-    border-radius: 20px; 
-    cursor: pointer; 
-    text-transform: capitalize;
+    gap: 10px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding-bottom: 7px;
 }
+
+/* Hide scrollbar */ .vc-filterbar::-webkit-scrollbar{ display: none; } .vc-filterbar{ scrollbar-width: none; }
+.vc-filterbtn {
+    background: #f2f2f2;
+    color: #4b4b4b;
+    border: none;
+    padding: 8px 35px;
+    border-radius: 20px;
+    cursor: pointer;
+    text-transform: capitalize;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: all 0.2s ease; white-space: nowrap;
+}
+
 .vc-filterbtn.active {
-     background: #272727; 
-    color: white; 
-} 
-.vc-videogrid { 
-    display: grid; 
+    background: #272727;
+    color: white;
+}
+
+.vc-filterbtn:hover{ background: #e5e7eb; }
+.vc-videogrid {
+    display: grid;
     border-radius: 10px;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); 
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 20px;
     /* padding: 8px 14px;  */
-    border-radius: 20px; 
-    cursor: pointer; 
+    border-radius: 20px;
+    cursor: pointer;
     border-radius: 10px;
+    padding: 0 10px;
 
 }
 
-.vc-videoinfo h4 { 
-    margin: 0 0 8px; 
-    font-size: 16px; 
+.vc-videoinfo h4 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #272727;
 }
+
 .vc-videocard {
     background: #fff;
     color: white;
     padding: 5px;
 }
-.thumbnail { 
-    width: 100%; 
+
+.thumbnail {
+    width: 100%;
     max-height: 100%;
-    object-fit: cover; 
+    object-fit: cover;
     border-radius: 5px;
 }
-.vc-videoinfo { 
-    padding: 10px; 
-} 
-.vc-videoinfo h4 { 
-    margin: 0 0 8px; 
-    font-size: 16px; 
+
+.vc-videoinfo {
+    padding: 10px;
 }
-.vc-videoinfo p { 
-    margin: 4px 0; color: #aaa; 
-    font-size: 14px; 
+
+.vc-videoinfo h4 {
+    margin: 0 0 8px;
+    font-size: 16px;
 }
+
+.vc-videoinfo p {
+    margin: 4px 0;
+    font-size: 14px;
+    font-weight: 400;
+    color: #aaa;
+}
+.vc-videoinfo p:nth-child(2) {
+    color: #8a8787;
+
+}
+
 /* .vc-home { height: 100%; overflow-y: auto; padding: 20px; } */
-.vc-homepage{
+.vc-homepage {
     /* width: 100%; */
     margin: 20px 0;
     /* margin-top: 64px; space for fixed header margin-left: 240px; space for fixed sidebar  */
     height: calc(100vh - 64px);
 
-    margin-top: 100px; 
-    margin-left: 240px; 
-    width: calc(100% - 240px); 
-    height: calc(100vh - 64px); 
+    margin-top: 100px;
+    margin-left: 240px;
+    width: calc(100% - 240px);
+    height: calc(100vh - 64px);
     transition: margin-left 0.3s ease, width 0.3s ease;
 }
-.vc-homepage.expanded { margin-left: 72px; width: calc(100% - 72px); }
+
+.vc-homepage.expanded {
+    margin-left: 72px;
+    width: calc(100% - 72px);
+}
 
 
 /* Header CSS End */
@@ -274,5 +330,79 @@ ght: calc(100vh - 64px); margin-top: 64px; */
 /* sidebar CSS End */
 /* Main CSS Start */
 /* Main CSS End */
-/* Header CSS Start */
-/* Header CSS Start */
+/* Responsive CSS Start */
+@media (max-width: 767px) {
+    .vc-header {
+        padding: 17px 10px;
+    }
+
+    .vc-search {
+        max-width: 180px;
+    }
+
+    .Search-bar {
+        padding: 8px 40px 8px 12px;
+        font-size: 14px;
+    }
+
+    .vc-videogrid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .vc-home {
+        padding: 12px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    .vc-videogrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 1023px){ .vc-filterbar{ gap: 10px; padding: 10px 0; } .vc-filterbtn{ padding: 8px 16px; font-size: 13px; } }
+@media (min-width: 1024px) {
+    .vc-overlay {
+        display: none;
+    }
+
+    .vc-videogrid {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    }
+}
+
+@media (max-width:992px) {
+    .vc-search {
+        max-width: 500px;
+    }
+    body{
+        background-attachment: fixed;
+    }
+}
+
+@media (max-width:767px) {
+    .vc-search {
+        max-width: 400px;
+    }
+    .vc-filterbar{ gap: 8px; padding: 8px 0; margin-bottom: 16px; } .vc-filterbtn{ padding: 7px 14px; font-size: 12px; } 
+
+}
+
+@media (max-width:675px) {
+    .vc-search {
+        max-width: 300px;
+    }
+
+}
+@media (max-width:575px) {
+    .vc-search {
+        max-width: 180px;
+    }
+    
+}
+@media (max-width:420px) {
+    .vc-filterbtn{ padding: 6px 12px; font-size: 11px; }
+}
+
+/* Responsive CSS End */
