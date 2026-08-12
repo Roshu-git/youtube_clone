@@ -4,6 +4,9 @@ const cors = require("cors");
 require("dotenv").config();
 
 const authRoutes = require("./routes/authRoutes.route");
+const videoRoutes = require("./routes/videoRoute.route");
+const channelRoutes = require("./routes/ChannelRoute.route");
+const commentRoutes = require("./routes/CommentRoute.route");
 
 const app = express();
 
@@ -26,7 +29,9 @@ mongoose
 
 // Routes
 app.use("/api/auth", authRoutes);
-
+app.use("/api/videos", videoRoutes);
+app.use("/api/channels", channelRoutes);
+app.use("/api/comments", commentRoutes);
 
 const PORT = 5000;
 

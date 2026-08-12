@@ -1150,5 +1150,27 @@ button.signin-button:hover {
         font-size: 11px;
     }
 }
+@media (max-width: 768px) {
 
+  .vc-videogrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .vc-sidebar {
+    display: none;
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .vc-videogrid {
+    grid-template-columns: 1fr;
+  }
+
+  .vc-search {
+    max-width: 200px;
+  }
+
+}
 /* Responsive CSS End */
