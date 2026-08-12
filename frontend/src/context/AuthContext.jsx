@@ -8,8 +8,8 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
 
+  // Load user from localStorage on app start
   const [user, setUser] = useState(() => {
-
     const savedUser = localStorage.getItem("user");
 
     return savedUser
@@ -17,10 +17,15 @@ export function AuthProvider({ children }) {
       : null;
   });
 
+  // Load token from localStorage on app start
+  const [token, setToken] = useState(() => {
+    return localStorage.getItem("token") || null;
+  });
 
-  const login = (userData, token) => {
+  // Login
+  const login = (userData, userToken) => {
 
-    localStorage.setItem("token", token);
+    localStorage.setItem("token", userToken);
 
     localStorage.setItem(
       "user",
@@ -28,32 +33,33 @@ export function AuthProvider({ children }) {
     );
 
     setUser(userData);
+    setToken(userToken);
   };
 
-
+  // Logout
   const logout = () => {
 
     localStorage.removeItem("token");
-
     localStorage.removeItem("user");
 
     setUser(null);
+    setToken(null);
   };
-
 
   return (
     <AuthContext.Provider
       value={{
         user,
+        token,
         login,
-        logout
+        logout,
+        isAuthenticated: !!token
       }}
     >
       {children}
     </AuthContext.Provider>
   );
 }
-
 
 export function useAuth() {
   return useContext(AuthContext);

@@ -4,10 +4,17 @@ import Header from './Components/Header.jsx';
 import Sidebar from './Components/Sidebar.jsx';
 import Home from './pages/Home.jsx';
 import VideoPlayer from './pages/VideoPlayer.jsx';
-import { Routes, Route } from 'react-router-dom';
-import SignIn from "./pages/SignIn";
+import Login from "./pages/Login.jsx";
+import Register from "./pages/Register.jsx";
+import Channel from './pages/Channel.jsx';
+import { Routes, Route, useLocation } from 'react-router-dom';
+import ProtectedRoute from './Components/ProtectedRoute.jsx';
 
 function App() {
+  const location = useLocation();
+  const isAuthPage =
+  location.pathname === "/login" ||
+  location.pathname === "/register";
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   // shared search state 
@@ -20,15 +27,19 @@ function App() {
   return (
     <div className='vc-mainapp'>
       <div className='vc-main'>
-        <Header toggleSidebar={toggleSidebar} search={search} setSearch={setSearch} />
+        {!isAuthPage && ( <Header toggleSidebar={toggleSidebar} search={search} setSearch={setSearch} /> )}
+        {/* <Header toggleSidebar={toggleSidebar} search={search} setSearch={setSearch} /> */}
         <div className='vc-mainlayout d-flex'>
-          <Sidebar isOpen={isSidebarOpen} />
+          {!isAuthPage && ( <Sidebar isOpen={isSidebarOpen} /> )}
+          {/* <Sidebar isOpen={isSidebarOpen} /> */}
           {/* <Home /> */}
           {/* <Home isSidebarOpen={isSidebarOpen} search={search} /> */}
           <Routes>
             <Route path="/" element={<Home isSidebarOpen={isSidebarOpen} search={search} /> } />
-            <Route path="/signin" element={<SignIn />} />
-          <Route path="/watch/:id" element={<VideoPlayer isSidebarOpen={isSidebarOpen} />} />
+             <Route path="/login" element={<Login />} />
+             <Route path="/register" element={<Register />} />
+             <Route path="/channel" element={ <ProtectedRoute> <Channel /> </ProtectedRoute> } />
+              <Route path="/watch/:id" element={<VideoPlayer isSidebarOpen={isSidebarOpen} />} />
           </Routes>
         </div>
       </div>

@@ -4,7 +4,7 @@ const videos = [
     title: "Learn React in 30 Minutes",
     thumbnailUrl:
       "https://i.ytimg.com/vi/w7ejDZ8SWv8/maxresdefault.jpg",
-
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
     description:
       "A quick tutorial to get started with React.",
 
@@ -38,7 +38,7 @@ const videos = [
     title: "MERN Stack Full Course",
     thumbnailUrl:
       "https://i.ytimg.com/vi/7CqJlxBYj-M/maxresdefault.jpg",
-
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
     description:
       "Learn how to build full-stack applications using MongoDB, Express, React, and Node.js.",
 
@@ -64,7 +64,7 @@ const videos = [
     title: "JavaScript Crash Course",
     thumbnailUrl:
       "https://i.ytimg.com/vi/hdI2bqOjy3c/maxresdefault.jpg",
-
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
     description:
       "A complete JavaScript crash course covering the fundamentals.",
 
@@ -90,7 +90,7 @@ const videos = [
     title: "Node.js API Tutorial",
     thumbnailUrl:
       "https://i.ytimg.com/vi/Oe421EPjeBE/maxresdefault.jpg",
-
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
     description:
       "Learn how to create REST APIs using Node.js and Express.",
 
@@ -116,7 +116,7 @@ const videos = [
     title: "JavaScript Crash Course",
     thumbnailUrl:
       "https://i.ytimg.com/vi/hdI2bqOjy3c/maxresdefault.jpg",
-
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
     description:
       "Learn JavaScript fundamentals with this beginner-friendly crash course.",
 
@@ -142,7 +142,7 @@ const videos = [
     title: "MERN Stack Full Course",
     thumbnailUrl:
       "https://i.ytimg.com/vi/7CqJlxBYj-M/maxresdefault.jpg",
-
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
     description:
       "Build modern full-stack web applications using the MERN stack.",
 
@@ -168,7 +168,7 @@ const videos = [
     title: "Learn React in 30 Minutes",
     thumbnailUrl:
       "https://i.ytimg.com/vi/w7ejDZ8SWv8/maxresdefault.jpg",
-
+    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
     description:
       "A quick introduction to React for beginners.",
 

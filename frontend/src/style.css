@@ -402,7 +402,8 @@ p.vc-chadec {
 
 .vc-channel {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    /* align-items: center; */
     gap: 4px;
 }
 
@@ -488,6 +489,11 @@ main.vc-watch-main{
 .vc-playeritem{
     padding: 0 20px;
 }
+.vc-player video {
+    max-width: 864px;
+    width: 100%;
+    min-width: 864px;
+}
 .vc-player img {
     border-radius: 5px;
     width: 100%;
@@ -521,7 +527,22 @@ main.vc-watch-main{
     margin: auto;
     margin-top: 80px;
 }
-
+.no-videos{
+    background-color: #fff;
+    max-width: 500px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 50px;
+}
+.no-videos h3{
+    font-size: 18px;
+    font-weight: 500;
+    color: #272727;
+    padding: 10px 0;
+}
+.no-videos p{
+    color: #606060;
+}
 
 /* ==============================
    VIDEO PLAYER
@@ -595,10 +616,9 @@ main.vc-watch-main{
 
 .vc-watch-title {
     font-size: 22px;
-
     margin: 15px 0 8px;
-
     line-height: 1.4;
+    font-weight: 600;
 }
 
 
@@ -653,8 +673,8 @@ main.vc-watch-main{
 
 .vc-channel-details h3 {
     margin: 0;
-
     font-size: 16px;
+    font-weight: 600;
 }
 
 
@@ -668,21 +688,36 @@ main.vc-watch-main{
 
 
 /* Subscribe */
+.vc-channel-actions{
+    display: flex;
+    gap: 10px;
+}
+button.vc-join-btn{
+    background-color: #217BFF;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .5s ease-in-out;
+}
+button.vc-join-btn:hover{
+    background: #0f0f0f;
+}
 
 .vc-subscribe-btn {
     background: #0f0f0f;
-
     color: white;
-
     border: none;
-
     border-radius: 20px;
-
     padding: 10px 18px;
-
     font-weight: 600;
-
     cursor: pointer;
+    transition: all .5s ease-in-out;
+}
+.vc-subscribe-btn:hover {
+    background-color: #217BFF;
 }
 
 
@@ -701,15 +736,10 @@ main.vc-watch-main{
 
 .vc-action-section button {
     border: none;
-
     background: #f2f2f2;
-
     padding: 9px 15px;
-
     border-radius: 20px;
-
     cursor: pointer;
-
     font-size: 14px;
 }
 
@@ -717,7 +747,9 @@ main.vc-watch-main{
 .vc-action-section button:hover {
     background: #e5e5e5;
 }
-
+button.dotbtn{
+    padding: 0px 10px;
+}
 
 /* ==============================
    DESCRIPTION
@@ -1019,7 +1051,9 @@ main.vc-watch-main{
   font-size: 14px;
 }
 
-
+.signin-switch a{
+    color: #1a73e8;
+}
 .signin-switch button {
   border: none;
   background: transparent;
@@ -1050,6 +1084,11 @@ button.signin-button:hover {
 /* Main CSS Start */
 /* Main CSS End */
 /* Responsive CSS Start */
+@media (max-width: 1399px) {
+    .vc-channel-section{
+        flex-wrap: wrap;
+    }
+}
 @media (max-width: 767px) {
     .vc-header {
         padding: 17px 10px;
@@ -1080,6 +1119,11 @@ button.signin-button:hover {
     }
 }
 
+@media (max-width: 1024px) {
+    .vc-watch-layout {
+        grid-template-columns: 1fr;
+    }
+}
 @media (max-width: 1023px) {
     .vc-filterbar {
         gap: 10px;
@@ -1156,9 +1200,6 @@ button.signin-button:hover {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .vc-sidebar {
-    display: none;
-  }
 
 }
 
