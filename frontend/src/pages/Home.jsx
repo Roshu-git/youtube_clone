@@ -29,7 +29,15 @@ function Home({ isSidebarOpen, search }) {
                 <FilterBar category={category} setCategory={setCategory}    />
 
                 <div className='vc-videogrid'>
-                    {filteredVideos.map((video) => ( <VideoCard key={video.videoId} video={video} /> ))}
+                    {filteredVideos.length > 0 ? (
+                    (filteredVideos.map((video) => ( <VideoCard key={video.videoId} video={video} /> ))
+                    )
+            ) : (
+                    <div className="no-videos">
+                    <h3>No videos found</h3>
+                    <p>Try another search or category.</p>
+                </div>
+            )}
                     {/* {videos.map((video)=>(
                         <VideoCard key={video.videoId} video={video} />
                     ))} */}

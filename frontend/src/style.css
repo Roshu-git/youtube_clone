@@ -959,22 +959,16 @@ main.vc-watch-main{
 
 .signin-card {
   width: 400px;
-
   background: white;
-
   border: 1px solid #dadce0;
-
   border-radius: 12px;
-
   padding: 40px;
-
   box-sizing: border-box;
 }
 
 
 .signin-card h1 {
   margin: 0 0 10px;
-
   font-size: 28px;
 }
 

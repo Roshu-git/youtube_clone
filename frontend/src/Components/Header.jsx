@@ -42,9 +42,7 @@ function Header({toggleSidebar, search, setSearch}) {
             <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center"> 
                 <User size={22} className="text-gray-700" /> 
             </div>
-            <div className='vc-signin-btn'>
-                {/* <div className="header-right"> */}
-
+            <div className='vc-signin-btn flex gap-2 items-center'>
             {/* {token && user ? ( */}
             {user ? (
                 <>
@@ -52,7 +50,7 @@ function Header({toggleSidebar, search, setSearch}) {
             <div className="header-user">
                 {user.username}
             </div>
-            <button onClick={logout}>
+            <button className="signin-button" onClick={logout}>
                 Logout
               </button>
             </>
