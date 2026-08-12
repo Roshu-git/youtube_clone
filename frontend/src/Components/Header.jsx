@@ -1,12 +1,13 @@
 import React from 'react';
 import { User } from 'lucide-react';
 import {Link} from 'react-router-dom';
-import logo from '../assets/images/logo.svg';
+import logo from '../../public/images/logo.svg';
+import { Search } from 'lucide-react';
 
-function Header({toggleSidebar}) {
+function Header({toggleSidebar, search, setSearch}) {
   return (
     <header className='vc-header'>
-        <div className='vc-headlogo flex-row gap-2'>
+        <div className='vc-headlogo flex flex-row items-center gap-3'>
         <button className='vc-humburger' onClick={toggleSidebar}>
             <span></span>
             <span></span>
@@ -18,8 +19,11 @@ function Header({toggleSidebar}) {
             </Link>
         </div>
         </div>
-        <div className='vc-search'>
-            <input type='text' placeholder="search Here..." className='Search-bar' />
+        <div className='vc-search flex items-center justify-between'>
+            <input type='text' placeholder="search Here..." value={search} onChange={(e)=> setSearch(e.target.value)} className='Search-bar flex-1 px-4 py-2 border border-gray-300 rounded-l-full focus:outline-none focus:ring-2 focus:ring-blue-500 ' />
+            <button type="button" onClick={() => {}} className="search-btn px-5 py-2 border border-l-0 border-gray-300 rounded-r-full bg-gray-100  transition " > 
+                <Search size={22} className="text-black" /> 
+            </button>
         </div>
         <div className='vc-profile'>
             <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center"> 
