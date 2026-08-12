@@ -4,6 +4,8 @@ import "./style.css";
 import Header from './Components/Header.jsx';
 import Sidebar from './Components/Sidebar.jsx';
 import Home from './pages/Home.jsx';
+import VideoPlayer from './pages/VideoPlayer.jsx';
+import { Routes, Route } from 'react-router-dom';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -22,9 +24,14 @@ function App() {
         <div className='vc-mainlayout d-flex'>
           <Sidebar isOpen={isSidebarOpen} />
           {/* <Home /> */}
-          <Home isSidebarOpen={isSidebarOpen} search={search} />
+          {/* <Home isSidebarOpen={isSidebarOpen} search={search} /> */}
+          <Routes>
+            <Route path="/" element={<Home isSidebarOpen={isSidebarOpen} search={search} /> } />
+          <Route path="/watch/:id" element={<VideoPlayer isSidebarOpen={isSidebarOpen} />} />
+          </Routes>
         </div>
       </div>
+      {/* <Routes> <Route path="/" element={<Home />} /> <Route path="/watch/:id" element={<VideoPlayer />} /> </Routes> */}
     </div>
   )
 }
