@@ -26,6 +26,7 @@ mongoose
     console.error("MongoDB connection error:", error);
   });
 
+  
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/videos", videoRoutes);
