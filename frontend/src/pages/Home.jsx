@@ -73,7 +73,6 @@ function Home({ isSidebarOpen, search }) {
   useEffect(() => {
     fetchVideos();
   }, [search, category]);
-
   return (
     <div
       className={`vc-homepage ${
