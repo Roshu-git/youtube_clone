@@ -1430,11 +1430,6 @@ p.vc-nopost {
   width: 100%;
 }
 
-@media (max-width: 1000px) {
-  .video-page-layout {
-    grid-template-columns: 1fr;
-  }
-}
 
 /* Channel CSS End */
 /* Main CSS Start */
@@ -1480,6 +1475,11 @@ p.vc-nopost {
     }
 }
 
+@media (max-width: 1000px) {
+  .video-page-layout {
+    grid-template-columns: 1fr;
+  }
+}
 @media (max-width:992px) {
     .vc-search {
         max-width: 500px;
