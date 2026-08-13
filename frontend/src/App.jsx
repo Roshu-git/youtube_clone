@@ -1,48 +1,111 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import "./style.css";
-import Header from './Components/Header.jsx';
-import Sidebar from './Components/Sidebar.jsx';
-import Home from './pages/Home.jsx';
-import VideoPlayer from './pages/VideoPlayer.jsx';
+
+import Header from "./Components/Header.jsx";
+import Sidebar from "./Components/Sidebar.jsx";
+import ProtectedRoute from "./Components/ProtectedRoute.jsx";
+
+import Home from "./pages/Home.jsx";
+import VideoPlayer from "./pages/VideoPlayer.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
-import Channel from './pages/Channel.jsx';
-import { Routes, Route, useLocation } from 'react-router-dom';
-import ProtectedRoute from './Components/ProtectedRoute.jsx';
+import Channel from "./pages/Channel.jsx";
+import CreateChannel from "./pages/CreateChannel";
+
+import { Routes, Route, useLocation } from "react-router-dom";
 
 function App() {
   const location = useLocation();
+
   const isAuthPage =
-  location.pathname === "/login" ||
-  location.pathname === "/register";
+    location.pathname === "/login" ||
+    location.pathname === "/register";
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  // shared search state 
-  const [search, setSearch] = useState('');
+  // Shared search state
+  const [search, setSearch] = useState("");
 
-  const toggleSidebar = () =>{
-    // setIsSidebarOpen(!isSidebarOpen);
-    setIsSidebarOpen(prev => !prev);
-  }
+  const toggleSidebar = () => {
+    setIsSidebarOpen((prev) => !prev);
+  };
 
   return (
-    <div className='vc-mainapp'>
-      <div className='vc-main'>
-        {!isAuthPage && ( <Header toggleSidebar={toggleSidebar} search={search} setSearch={setSearch} /> )}
-        <div className='vc-mainlayout d-flex'>
-          {!isAuthPage && ( <Sidebar isOpen={isSidebarOpen} /> )}
- 
+    <div className="vc-mainapp">
+      <div className="vc-main">
+
+        {/* HEADER */}
+        {!isAuthPage && (
+          <Header
+            toggleSidebar={toggleSidebar}
+            search={search}
+            setSearch={setSearch}
+          />
+        )}
+
+        <div className="vc-mainlayout d-flex">
+
+          {/* SIDEBAR */}
+          {!isAuthPage && (
+            <Sidebar isOpen={isSidebarOpen} />
+          )}
+
+          {/* ROUTES */}
           <Routes>
-            <Route path="/" element={<Home isSidebarOpen={isSidebarOpen} search={search} /> } />
-             <Route path="/login" element={<Login />} />
-             <Route path="/register" element={<Register />} />
-             <Route path="/channel" element={ <ProtectedRoute> <Channel isSidebarOpen={isSidebarOpen} /> </ProtectedRoute> } />
-              <Route path="/watch/:id" element={<VideoPlayer isSidebarOpen={isSidebarOpen} />} />
+
+            {/* HOME */}
+            <Route
+              path="/"
+              element={
+                <Home
+                  isSidebarOpen={isSidebarOpen}
+                  search={search}
+                />
+              }
+            />
+
+            {/* AUTH */}
+            <Route
+              path="/login"
+              element={<Login />}
+            />
+
+            <Route
+              path="/register"
+              element={<Register />}
+            />
+
+            {/* CHANNEL */}
+            <Route
+              path="/channel"
+              element={
+                <ProtectedRoute>
+                  <Channel
+                    isSidebarOpen={isSidebarOpen}
+                  />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* VIDEO PLAYER */}
+
+              <Route path="/create-channel" element={<CreateChannel />} />
+
+            <Route
+              path="/video/:videoId"
+              element={
+                <VideoPlayer
+                  isSidebarOpen={isSidebarOpen}
+                />
+              }
+            />
+
           </Routes>
+
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

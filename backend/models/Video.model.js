@@ -1,58 +1,70 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const videoSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: true
+      required: [true, "Video title is required"],
+      trim: true,
+      minlength: [3, "Title must be at least 3 characters"],
+      maxlength: [150, "Title cannot exceed 150 characters"]
     },
 
     description: {
       type: String,
-      default: ""
+      default: "",
+      trim: true
     },
 
     videoUrl: {
       type: String,
-      required: true
+      required: [true, "Video URL is required"],
+      trim: true
     },
 
     thumbnailUrl: {
       type: String,
-      required: true
+      required: [true, "Thumbnail URL is required"],
+      trim: true
     },
 
     category: {
       type: String,
-      required: true
+      required: [true, "Category is required"],
+      trim: true
     },
 
-    channel: {
+    channelId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Channel",
-      required: true
+      required: [true, "Channel is required"]
     },
 
     uploader: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true
+      required: [true, "Uploader is required"]
     },
 
     views: {
       type: Number,
-      default: 0
+      default: 0,
+      min: 0
     },
 
-    likes: {
-      type: Number,
-      default: 0
-    },
+    likes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+      }
+    ],
 
-    dislikes: {
-      type: Number,
-      default: 0
-    },
+    dislikes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+      }
+    ],
 
     uploadDate: {
       type: Date,
@@ -64,4 +76,4 @@ const videoSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Video", videoSchema);
+export default mongoose.model("Video", videoSchema);

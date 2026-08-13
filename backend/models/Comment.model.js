@@ -1,22 +1,25 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const commentSchema = new mongoose.Schema(
   {
     video: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Video",
-      required: true
+      required: [true, "Video is required"]
     },
 
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true
+      required: [true, "User is required"]
     },
 
     text: {
       type: String,
-      required: true
+      required: [true, "Comment text is required"],
+      trim: true,
+      minlength: [1, "Comment cannot be empty"],
+      maxlength: [1000, "Comment cannot exceed 1000 characters"]
     }
   },
   {
@@ -24,4 +27,4 @@ const commentSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Comment", commentSchema);
+export default mongoose.model("Comment", commentSchema);

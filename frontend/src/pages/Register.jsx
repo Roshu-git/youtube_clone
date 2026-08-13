@@ -1,30 +1,41 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function Register() {
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const [formData, setFormData] = useState({
     username: "",
     email: "",
-    password: ""
+    password: "",
   });
 
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
+  // =========================
+  // HANDLE INPUT CHANGE
+  // =========================
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
 
     setError("");
     setSuccess("");
   };
 
+  // =========================
+  // HANDLE REGISTER
+  // =========================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -32,45 +43,62 @@ function Register() {
     setSuccess("");
 
     // Username validation
+    if (!formData.username.trim()) {
+      setError("Username is required");
+      return;
+    }
+
     if (formData.username.trim().length < 3) {
       setError("Username must be at least 3 characters");
       return;
     }
 
+    // Email validation
+    if (!formData.email.trim()) {
+      setError("Email is required");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(formData.email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
     // Password validation
+    if (!formData.password) {
+      setError("Password is required");
+      return;
+    }
+
     if (formData.password.length < 6) {
       setError("Password must be at least 6 characters");
       return;
     }
 
-    // Confirm password
+    // Confirm password validation
+    if (!confirmPassword) {
+      setError("Please confirm your password");
+      return;
+    }
+
     if (formData.password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/auth/register",
-        {
-          method: "POST",
+      setLoading(true);
 
-          headers: {
-            "Content-Type": "application/json"
-          },
-
-          body: JSON.stringify({
-            username: formData.username,
-            email: formData.email,
-            password: formData.password
-          })
-        }
+      const result = await register(
+        formData.username.trim(),
+        formData.email.trim().toLowerCase(),
+        formData.password
       );
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.message || "Registration failed");
+      if (!result.success) {
+        setError(result.message || "Registration failed");
         return;
       }
 
@@ -78,66 +106,65 @@ function Register() {
         "Registration successful! Redirecting to login..."
       );
 
-      // Go to login page
+      // Redirect to login after successful registration
       setTimeout(() => {
         navigate("/login");
       }, 1500);
-
     } catch (error) {
-      console.error(error);
+      console.error("REGISTER PAGE ERROR:", error);
 
       setError("Unable to connect to server");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="signin-page">
-
       <div className="signin-card">
 
-        <h1>Hello ! Welcome</h1>
+        <h1>Hello! Welcome</h1>
 
         <p>
-          Please Signup To Create Your Account.
+          Please sign up to create your account.
         </p>
 
         <form onSubmit={handleSubmit}>
 
           {/* Username */}
-
           <input
             type="text"
             name="username"
             placeholder="Username"
             value={formData.username}
             onChange={handleChange}
-            required
+            autoComplete="username"
+            disabled={loading}
           />
 
           {/* Email */}
-
           <input
             type="email"
             name="email"
             placeholder="Email"
             value={formData.email}
             onChange={handleChange}
-            required
+            autoComplete="email"
+            disabled={loading}
           />
 
           {/* Password */}
-
           <input
             type="password"
             name="password"
             placeholder="Password"
             value={formData.password}
             onChange={handleChange}
-            required
+            autoComplete="new-password"
+            disabled={loading}
           />
 
           {/* Confirm Password */}
-
           <input
             type="password"
             placeholder="Confirm Password"
@@ -145,12 +172,13 @@ function Register() {
             onChange={(e) => {
               setConfirmPassword(e.target.value);
               setError("");
+              setSuccess("");
             }}
-            required
+            autoComplete="new-password"
+            disabled={loading}
           />
 
           {/* Error */}
-
           {error && (
             <p className="signin-error">
               {error}
@@ -158,21 +186,25 @@ function Register() {
           )}
 
           {/* Success */}
-
           {success && (
             <p className="signin-success">
               {success}
             </p>
           )}
 
-          <button type="submit">
-            Register
+          {/* Register Button */}
+          <button
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? "Creating Account..." : "Register"}
           </button>
 
         </form>
 
+        {/* Login Link */}
         <div className="signin-switch">
-          Already have an account?
+          Already have an account?{" "}
 
           <Link to="/login">
             Sign in
@@ -180,7 +212,6 @@ function Register() {
         </div>
 
       </div>
-
     </div>
   );
 }

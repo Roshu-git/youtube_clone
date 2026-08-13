@@ -8,7 +8,7 @@ function Login() {
 
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    password: "",
   });
 
   const [error, setError] = useState("");
@@ -17,7 +17,7 @@ function Login() {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
 
     setError("");
@@ -35,46 +35,25 @@ function Login() {
       return;
     }
 
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/auth/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password
-          })
-        }
-      );
+    const result = await login(
+      formData.email,
+      formData.password
+    );
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.message || "Login failed");
-        return;
-      }
-
-      // Save user + token in AuthContext
-      login(data.user, data.token);
-
-      setSuccess("Login successful! Redirecting...");
-
-      setTimeout(() => {
-        navigate("/");
-      }, 1000);
-
-    } catch (error) {
-      console.error(error);
-      setError("Unable to connect to server");
+    if (!result.success) {
+      setError(result.message);
+      return;
     }
+
+    setSuccess("Login successful! Redirecting...");
+
+    setTimeout(() => {
+      navigate("/");
+    }, 800);
   };
 
   return (
     <div className="signin-page">
-
       <div className="signin-card">
 
         <h1>Welcome, Sign-in here</h1>
@@ -130,7 +109,6 @@ function Login() {
         </div>
 
       </div>
-
     </div>
   );
 }

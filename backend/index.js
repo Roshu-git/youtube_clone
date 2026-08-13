@@ -1,20 +1,20 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-require("dotenv").config();
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import dotenv from "dotenv";
 
-const authRoutes = require("./routes/authRoutes.route");
-const videoRoutes = require("./routes/videoRoute.route");
-const channelRoutes = require("./routes/ChannelRoute.route");
-const commentRoutes = require("./routes/CommentRoute.route");
+import authRoutes from "./routes/authRoutes.route.js";
+import videoRoutes from "./routes/videoRoute.route.js";
+import channelRoutes from "./routes/ChannelRoute.route.js";
+import commentRoutes from "./routes/CommentRoute.route.js";
+
+dotenv.config();
 
 const app = express();
-
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-
 
 // MongoDB
 mongoose
@@ -23,9 +23,8 @@ mongoose
     console.log("MongoDB connected");
   })
   .catch((error) => {
-    console.error(error);
+    console.error("MongoDB connection error:", error);
   });
-
 
 // Routes
 app.use("/api/auth", authRoutes);
@@ -36,7 +35,5 @@ app.use("/api/comments", commentRoutes);
 const PORT = 5000;
 
 app.listen(PORT, () => {
-  console.log(
-    `Server running on port ${PORT}`
-  );
+  console.log(`Server running on port ${PORT}`);
 });
