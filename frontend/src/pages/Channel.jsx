@@ -207,7 +207,11 @@ function Channel({ isSidebarOpen }) {
               {videos.slice(0, 4).map((video) => (
                 <div key={video.id} className='channel-video-card bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition'>
                   <img
-                    src={video.thumbnailUrl}
+                    src={video.thumbnailUrl &&
+    !video.thumbnailUrl.startsWith("blob:")
+      ? video.thumbnailUrl
+      : "/images/default-thumbnail.jpg"
+  }
                     alt={video.title}
                     className='w-full aspect-video object-cover'
                   />
