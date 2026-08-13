@@ -33,7 +33,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: ""
     },
-
     channels: [
       {
         type: mongoose.Schema.Types.ObjectId,
