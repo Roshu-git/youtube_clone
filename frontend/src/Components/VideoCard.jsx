@@ -2,19 +2,49 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 function VideoCard({ video }) {
+  if (!video) {
+    return null;
+  }
+
   // ==========================================
   // GET VIDEO ID
   // ==========================================
 
-  const videoId = video?._id || video?.videoId;
+  const videoId =
+    video._id ||
+    video.id ||
+    video.videoId;
+
+  // ==========================================
+  // DEBUG
+  // ==========================================
+
+  console.log("VIDEO CARD DATA:", video);
+  console.log("VIDEO CARD ID:", videoId);
+
+  // Do not create /video/undefined
+  if (!videoId) {
+    console.error(
+      "VIDEO CARD ERROR: Video ID is missing",
+      video
+    );
+
+    return (
+      <div className="vc-videocard">
+        <div className="p-4 text-red-500">
+          Video ID is missing
+        </div>
+      </div>
+    );
+  }
 
   // ==========================================
   // CHANNEL NAME
   // ==========================================
 
   const channelName =
-    video?.channel?.channelName ||
-    video?.channelName ||
+    video.channel?.channelName ||
+    video.channelName ||
     "Unknown Channel";
 
   // ==========================================
@@ -78,20 +108,6 @@ function VideoCard({ video }) {
     )} years ago`;
   }
 
-  // ==========================================
-  // CHECK VIDEO ID
-  // ==========================================
-
-  if (!videoId) {
-    console.error("VIDEO CARD: VIDEO ID IS MISSING", video);
-
-    return null;
-  }
-
-  // ==========================================
-  // RENDER
-  // ==========================================
-
   return (
     <div className="vc-videocard">
 
@@ -100,19 +116,17 @@ function VideoCard({ video }) {
       ================================= */}
 
       <Link
-        to={`/watch/${videoId}`}
+        to={`/video/${videoId}`}
         className="vc-thumbnail-wrapper"
       >
         <img
-          src={video?.thumbnailUrl}
-          alt={video?.title || "Video"}
+          src={video.thumbnailUrl}
+          alt={video.title || "Video"}
           className="thumbnail"
           loading="lazy"
         />
 
-        {/* Video duration */}
-
-        {video?.duration && (
+        {video.duration && (
           <span className="vc-duration">
             {video.duration}
           </span>
@@ -129,10 +143,8 @@ function VideoCard({ video }) {
 
           {/* TITLE */}
 
-          <Link to={`/watch/${videoId}`}>
-            <h4>
-              {video?.title || "Untitled Video"}
-            </h4>
+          <Link to={`/video/${videoId}`}>
+            <h4>{video.title}</h4>
           </Link>
 
           {/* CHANNEL */}
@@ -143,9 +155,7 @@ function VideoCard({ video }) {
               {channelName}
             </p>
 
-            {/* VERIFIED CHANNEL */}
-
-            {video?.channel?.verified && (
+            {video.channel?.verified && (
               <span className="vc-verified">
                 ✓
               </span>
@@ -157,10 +167,10 @@ function VideoCard({ video }) {
 
           <p className="vc-meta">
 
-            {formatViews(video?.views || 0)}
+            {formatViews(video.views)}
 
-            {(video?.uploadDate ||
-              video?.createdAt) && (
+            {(video.uploadDate ||
+              video.createdAt) && (
               <>
                 {" • "}
                 {formatDate(
