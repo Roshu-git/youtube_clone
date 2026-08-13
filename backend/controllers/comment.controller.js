@@ -153,7 +153,6 @@ export const updateComment = async (req, res) => {
         message: "Comment not found",
       });
     }
-
     // Only comment owner can edit
     if (comment.user.toString() !== req.user.id) {
       return res.status(403).json({
