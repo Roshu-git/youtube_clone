@@ -554,7 +554,7 @@ function Channel({ isSidebarOpen }) {
       {/* TABS */}
       {/* ====================================== */}
 
-      <div className="channel-tabs flex gap-6 px-6 border-b overflow-x-auto">
+      <div className="channel-tabs flex gap-6 px-6 overflow-x-auto">
 
         {[
           "Home",
@@ -928,7 +928,7 @@ function Channel({ isSidebarOpen }) {
 
       {activeTab === "Shorts" && (
 
-        <p className="text-center py-16 text-gray-500">
+        <p className="text-center py-16 text-gray-500 vc-nopost">
           No shorts uploaded yet.
         </p>
 
@@ -940,7 +940,7 @@ function Channel({ isSidebarOpen }) {
 
       {activeTab === "Live" && (
 
-        <p className="text-center py-16 text-gray-500">
+        <p className="text-center py-16 text-gray-500 vc-nopost">
           No live streams yet.
         </p>
 
@@ -952,7 +952,7 @@ function Channel({ isSidebarOpen }) {
 
       {activeTab === "Playlists" && (
 
-        <p className="text-center py-16 text-gray-500">
+        <p className="text-center py-16 text-gray-500 vc-nopost">
           No playlists created yet.
         </p>
 
@@ -964,7 +964,7 @@ function Channel({ isSidebarOpen }) {
 
       {activeTab === "Community" && (
 
-        <p className="text-center py-16 text-gray-500">
+        <p className="text-center py-16 text-gray-500 vc-nopost">
           No community posts yet.
         </p>
 

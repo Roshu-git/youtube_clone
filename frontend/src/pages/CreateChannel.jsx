@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 
 const API_URL = "http://localhost:5000/api";
 
-function CreateChannel() {
+function CreateChannel({ isSidebarOpen}) {
   const { token } = useAuth();
   const navigate = useNavigate();
 
@@ -90,7 +90,10 @@ function CreateChannel() {
   };
 
   return (
-    <div className="vc-create-channel">
+    // <div className="vc-create-channel >
+    <div className={`vc-create-channel ${
+        !isSidebarOpen ? "expanded" : ""
+      }`}>
 
       <div className="vc-create-channel-container">
 
@@ -120,13 +123,13 @@ function CreateChannel() {
           {/* =============================
               CHANNEL NAME
           ============================= */}
-          <div className="vc-form-group">
+          <div className="vc-form-group file-input-group">
 
             <label htmlFor="channelName">
               Channel Name
             </label>
 
-            <input
+            <input className="channel-input"
               id="channelName"
               name="channelName"
               type="text"
@@ -142,13 +145,13 @@ function CreateChannel() {
           {/* =============================
               DESCRIPTION
           ============================= */}
-          <div className="vc-form-group">
+          <div className="vc-form-group file-input-group">
 
             <label htmlFor="description">
               Description
             </label>
 
-            <textarea
+            <textarea className="channel-input"
               id="description"
               name="description"
               placeholder="Tell viewers about your channel"
@@ -163,13 +166,13 @@ function CreateChannel() {
           {/* =============================
               BANNER URL
           ============================= */}
-          <div className="vc-form-group">
+          <div className="vc-form-group file-input-group">
 
             <label htmlFor="bannerUrl">
               Banner URL
             </label>
 
-            <input
+            <input className="channel-input"
               id="bannerUrl"
               name="bannerUrl"
               type="url"

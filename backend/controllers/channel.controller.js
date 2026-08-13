@@ -1,9 +1,10 @@
 import Channel from "../models/Channel.model.js";
 import User from "../models/User.model.js";
 
-// =============================
+// =====================================================
 // CREATE CHANNEL
-// =============================
+// POST /api/channels
+// =====================================================
 export const createChannel = async (req, res) => {
   try {
     const {
@@ -12,15 +13,25 @@ export const createChannel = async (req, res) => {
       channelBanner,
     } = req.body;
 
+    // -----------------------------------------------
+    // Validate channel name
+    // -----------------------------------------------
     if (!channelName || !channelName.trim()) {
       return res.status(400).json({
         message: "Channel name is required",
       });
     }
 
-    // Owner comes from JWT
+    // -----------------------------------------------
+    // Get logged-in user from JWT
+    // -----------------------------------------------
     const ownerId = req.user.id;
 
+    console.log("CREATE CHANNEL USER:", ownerId);
+
+    // -----------------------------------------------
+    // Check user exists
+    // -----------------------------------------------
     const user = await User.findById(ownerId);
 
     if (!user) {
@@ -29,6 +40,23 @@ export const createChannel = async (req, res) => {
       });
     }
 
+    // -----------------------------------------------
+    // Check if user already has a channel
+    // -----------------------------------------------
+    const userChannel = await Channel.findOne({
+      owner: ownerId,
+    });
+
+    if (userChannel) {
+      return res.status(409).json({
+        message: "You already have a channel",
+        channel: userChannel,
+      });
+    }
+
+    // -----------------------------------------------
+    // Check duplicate channel name
+    // -----------------------------------------------
     const existingChannel = await Channel.findOne({
       channelName: channelName.trim(),
     });
@@ -39,6 +67,9 @@ export const createChannel = async (req, res) => {
       });
     }
 
+    // -----------------------------------------------
+    // Create channel
+    // -----------------------------------------------
     const channel = await Channel.create({
       channelName: channelName.trim(),
       owner: ownerId,
@@ -46,22 +77,39 @@ export const createChannel = async (req, res) => {
       channelBanner: channelBanner?.trim() || "",
     });
 
-    // Add channel to user's channels
+    console.log("CHANNEL CREATED:", channel._id);
+
+    // -----------------------------------------------
+    // Add channel to user's channels array
+    // -----------------------------------------------
     if (!user.channels) {
       user.channels = [];
     }
 
-    user.channels.push(channel._id);
+    // Prevent duplicate channel ID
+    const alreadyAdded = user.channels.some(
+      (id) => id.toString() === channel._id.toString()
+    );
 
-    await user.save();
+    if (!alreadyAdded) {
+      user.channels.push(channel._id);
+      await user.save();
+    }
 
+    // -----------------------------------------------
+    // Populate channel
+    // -----------------------------------------------
     const populatedChannel =
       await Channel.findById(channel._id)
         .populate("owner", "username email avatar")
         .populate("videos");
 
+    // -----------------------------------------------
+    // Response
+    // -----------------------------------------------
     return res.status(201).json({
       message: "Channel created successfully",
+      hasChannel: true,
       channel: populatedChannel,
     });
 
@@ -76,41 +124,68 @@ export const createChannel = async (req, res) => {
 };
 
 
-// =============================
+// =====================================================
 // GET MY CHANNEL
-// =============================
+// GET /api/channels/my
+// =====================================================
 export const getMyChannel = async (req, res) => {
   try {
+    // -----------------------------------------------
+    // Get logged-in user ID
+    // -----------------------------------------------
     const userId = req.user.id;
 
-    console.log("GET MY CHANNEL USER:", userId);
+    console.log("=================================");
+    console.log("GET MY CHANNEL");
+    console.log("USER ID:", userId);
+    console.log("=================================");
 
+    // -----------------------------------------------
+    // Find channel owned by current user
+    // -----------------------------------------------
     const channel = await Channel.findOne({
       owner: userId,
     })
-        console.log("FOUND CHANNEL:", channel);
-
-    //   .populate("owner", "username email avatar")
-    //   .populate("videos");
-
-    if (!channel) {
-      return res.status(404).json({
-        message: "You have not created a channel yet.",
-      });
-    }
-
-    const populatedChannel = await Channel.findById(channel._id)
       .populate("owner", "username email avatar")
       .populate("videos");
 
-    console.log("RETURNING CHANNEL:", populatedChannel);
+    console.log("FOUND CHANNEL:", channel);
+
+    // -----------------------------------------------
+    // User does NOT have a channel
+    // -----------------------------------------------
+    if (!channel) {
+      console.log(
+        "NO CHANNEL FOUND FOR USER:",
+        userId
+      );
+
+      return res.status(200).json({
+        message: "You have not created a channel yet.",
+        hasChannel: false,
+        channel: null,
+      });
+    }
+
+    // -----------------------------------------------
+    // User HAS a channel
+    // -----------------------------------------------
+    console.log(
+      "CHANNEL FOUND:",
+      channel._id
+    );
 
     return res.status(200).json({
-      channel: populatedChannel,
+      message: "Channel fetched successfully",
+      hasChannel: true,
+      channel,
     });
-    
+
   } catch (error) {
-    console.error("GET MY CHANNEL ERROR:", error);
+    console.error(
+      "GET MY CHANNEL ERROR:",
+      error
+    );
 
     return res.status(500).json({
       message: "Failed to fetch your channel",
@@ -120,29 +195,44 @@ export const getMyChannel = async (req, res) => {
 };
 
 
-// =============================
+// =====================================================
 // GET CHANNEL BY ID
-// =============================
+// GET /api/channels/:id
+// =====================================================
 export const getChannelById = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // -----------------------------------------------
+    // Find channel
+    // -----------------------------------------------
     const channel = await Channel.findById(id)
       .populate("owner", "username email avatar")
       .populate("videos");
 
+    // -----------------------------------------------
+    // Channel not found
+    // -----------------------------------------------
     if (!channel) {
       return res.status(404).json({
         message: "Channel not found",
+        channel: null,
       });
     }
 
+    // -----------------------------------------------
+    // Success
+    // -----------------------------------------------
     return res.status(200).json({
+      message: "Channel fetched successfully",
       channel,
     });
 
   } catch (error) {
-    console.error("GET CHANNEL ERROR:", error);
+    console.error(
+      "GET CHANNEL BY ID ERROR:",
+      error
+    );
 
     return res.status(500).json({
       message: "Failed to fetch channel",
@@ -152,13 +242,17 @@ export const getChannelById = async (req, res) => {
 };
 
 
-// =============================
+// =====================================================
 // UPDATE CHANNEL
-// =============================
+// PUT /api/channels/:id
+// =====================================================
 export const updateChannel = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // -----------------------------------------------
+    // Find channel
+    // -----------------------------------------------
     const channel = await Channel.findById(id);
 
     if (!channel) {
@@ -167,10 +261,16 @@ export const updateChannel = async (req, res) => {
       });
     }
 
-    // Only owner can update
-    if (channel.owner.toString() !== req.user.id) {
+    // -----------------------------------------------
+    // Check owner
+    // -----------------------------------------------
+    if (
+      channel.owner.toString() !==
+      req.user.id.toString()
+    ) {
       return res.status(403).json({
-        message: "You can only edit your own channel",
+        message:
+          "You can only edit your own channel",
       });
     }
 
@@ -180,32 +280,81 @@ export const updateChannel = async (req, res) => {
       channelBanner,
     } = req.body;
 
+    // -----------------------------------------------
+    // Update channel name
+    // -----------------------------------------------
     if (channelName !== undefined) {
-      channel.channelName = channelName.trim();
+      if (!channelName.trim()) {
+        return res.status(400).json({
+          message:
+            "Channel name cannot be empty",
+        });
+      }
+
+      // Check if another channel uses this name
+      const duplicateChannel =
+        await Channel.findOne({
+          channelName: channelName.trim(),
+          _id: { $ne: id },
+        });
+
+      if (duplicateChannel) {
+        return res.status(409).json({
+          message:
+            "Channel name already exists",
+        });
+      }
+
+      channel.channelName =
+        channelName.trim();
     }
 
+    // -----------------------------------------------
+    // Update description
+    // -----------------------------------------------
     if (description !== undefined) {
-      channel.description = description.trim();
+      channel.description =
+        description.trim();
     }
 
+    // -----------------------------------------------
+    // Update banner
+    // -----------------------------------------------
     if (channelBanner !== undefined) {
-      channel.channelBanner = channelBanner.trim();
+      channel.channelBanner =
+        channelBanner.trim();
     }
 
+    // -----------------------------------------------
+    // Save changes
+    // -----------------------------------------------
     await channel.save();
 
+    // -----------------------------------------------
+    // Get updated channel
+    // -----------------------------------------------
     const updatedChannel =
       await Channel.findById(channel._id)
-        .populate("owner", "username email avatar")
+        .populate(
+          "owner",
+          "username email avatar"
+        )
         .populate("videos");
 
+    // -----------------------------------------------
+    // Response
+    // -----------------------------------------------
     return res.status(200).json({
-      message: "Channel updated successfully",
+      message:
+        "Channel updated successfully",
       channel: updatedChannel,
     });
 
   } catch (error) {
-    console.error("UPDATE CHANNEL ERROR:", error);
+    console.error(
+      "UPDATE CHANNEL ERROR:",
+      error
+    );
 
     return res.status(500).json({
       message: "Failed to update channel",

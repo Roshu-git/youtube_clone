@@ -524,8 +524,27 @@ p.vc-chadec {
 .vc-homepage.expanded {
     margin-left: 72px;
     width: calc(100% - 72px);
+
 }
 
+.vc-create-channel{
+    margin-left: 220px;
+    margin-top: 90px;
+        padding: 0 10px;width: 100%;
+    
+}
+.vc-create-channel.expanded{
+     margin-left: 72px;
+}
+.vc-create-channel-container{
+    max-width: 700px;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    border-radius: 10px;
+    background-color: #fff;
+    padding: 15px 20px;
+}
 /* channel popup */
 .channel-modal-overlay {
     position: fixed;
@@ -574,6 +593,9 @@ p.vc-chadec {
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
+.vc-create-channel-container p{
+    margin-bottom: 20px;
+}
 .channel-actions {
     display: flex;
     justify-content: flex-end;
@@ -1319,7 +1341,7 @@ button.create-channel-btn {
 
 .file-input-group label {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 600;text-align: left;
 }
 
 .channel-video-grid {
@@ -1327,7 +1349,9 @@ button.create-channel-btn {
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 20px;
 }
-
+.vc-banner-preview{
+    margin: 10px 0;
+}
 .channel-video-card {
     /* background:#e1ebfb; */
     padding: 5px;

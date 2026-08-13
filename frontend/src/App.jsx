@@ -89,7 +89,7 @@ function App() {
 
             {/* VIDEO PLAYER */}
 
-              <Route path="/create-channel" element={<CreateChannel />} />
+              <Route path="/create-channel" element={<CreateChannel isSidebarOpen={isSidebarOpen}  />} />
 
             <Route
               path="/video/:videoId"
