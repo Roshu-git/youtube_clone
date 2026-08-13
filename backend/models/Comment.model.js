@@ -13,7 +13,6 @@ const commentSchema = new mongoose.Schema(
       ref: "User",
       required: [true, "User is required"]
     },
-
     text: {
       type: String,
       required: [true, "Comment text is required"],
