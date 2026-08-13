@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 import {
   ThumbsUp,
   ThumbsDown,
-  Share2
+  Share2,
 } from "lucide-react";
 
 import { useAuth } from "../context/AuthContext";
@@ -13,7 +13,10 @@ import Comment from "../Components/Comment";
 const API_URL = "http://localhost:5000/api";
 
 function VideoPlayer({ isSidebarOpen }) {
-  const { id } = useParams();
+  // IMPORTANT:
+  // App.jsx route must be: /watch/:videoId
+  const { videoId } = useParams();
+
   const { user, token } = useAuth();
 
   const [video, setVideo] = useState(null);
@@ -25,65 +28,116 @@ function VideoPlayer({ isSidebarOpen }) {
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // ==========================================
+  // =====================================================
+  // DEBUG VIDEO ID
+  // =====================================================
+
+  console.log("VIDEO ID FROM URL:", videoId);
+
+  // =====================================================
   // GET VIDEO
-  // ==========================================
-
-  const fetchVideo = async () => {
-    try {
-      setLoading(true);
-      setError("");
-
-      const response = await axios.get(
-        `${API_URL}/videos/${id}`
-      );
-
-      setVideo(response.data.video || response.data);
-
-    } catch (error) {
-      console.error("FETCH VIDEO ERROR:", error);
-
-      setError(
-        error.response?.data?.message ||
-        "Unable to load video"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ==========================================
-  // GET COMMENTS
-  // ==========================================
-
-  const fetchComments = async () => {
-    try {
-      const response = await axios.get(
-        `${API_URL}/comments/video/${id}`
-      );
-
-      setComments(
-        response.data.comments || response.data
-      );
-    } catch (error) {
-      console.error("FETCH COMMENTS ERROR:", error);
-
-      setComments([]);
-    }
-  };
-
-  // ==========================================
-  // LOAD DATA
-  // ==========================================
+  // =====================================================
 
   useEffect(() => {
-    fetchVideo();
-    fetchComments();
-  }, [id]);
+    if (!videoId) {
+      console.error("VIDEO ID IS UNDEFINED");
 
-  // ==========================================
+      setError("Video ID is missing from the URL.");
+      setLoading(false);
+
+      return;
+    }
+
+    const fetchVideo = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        console.log(
+          "FETCHING VIDEO:",
+          `${API_URL}/videos/${videoId}`
+        );
+
+        const response = await axios.get(
+          `${API_URL}/videos/${videoId}`
+        );
+
+        console.log("VIDEO RESPONSE:", response.data);
+
+        setVideo(
+          response.data.video || response.data
+        );
+
+      } catch (error) {
+        console.error(
+          "FETCH VIDEO ERROR:",
+          error
+        );
+
+        setError(
+          error.response?.data?.message ||
+          "Unable to load video"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVideo();
+  }, [videoId]);
+
+  // =====================================================
+  // GET COMMENTS
+  // =====================================================
+
+  useEffect(() => {
+    if (!videoId) {
+      return;
+    }
+
+    const fetchComments = async () => {
+      try {
+        setCommentsLoading(true);
+
+        console.log(
+          "FETCHING COMMENTS:",
+          `${API_URL}/comments/video/${videoId}`
+        );
+
+        const response = await axios.get(
+          `${API_URL}/comments/video/${videoId}`
+        );
+
+        console.log(
+          "COMMENTS RESPONSE:",
+          response.data
+        );
+
+        setComments(
+          response.data.comments ||
+          response.data ||
+          []
+        );
+
+      } catch (error) {
+        console.error(
+          "FETCH COMMENTS ERROR:",
+          error
+        );
+
+        setComments([]);
+
+      } finally {
+        setCommentsLoading(false);
+      }
+    };
+
+    fetchComments();
+  }, [videoId]);
+
+  // =====================================================
   // ADD COMMENT
-  // ==========================================
+  // =====================================================
 
   const handleAddComment = async () => {
     if (!token) {
@@ -95,47 +149,57 @@ function VideoPlayer({ isSidebarOpen }) {
       return;
     }
 
+    if (!videoId) {
+      alert("Video ID is missing.");
+      return;
+    }
+
     try {
       setCommentsLoading(true);
 
       const response = await axios.post(
         `${API_URL}/comments`,
         {
-          videoId: id,
-          text: newComment.trim()
+          videoId: videoId,
+          text: newComment.trim(),
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
       const createdComment =
-        response.data.comment || response.data;
+        response.data.comment ||
+        response.data;
 
       setComments((prev) => [
         createdComment,
-        ...prev
+        ...prev,
       ]);
 
       setNewComment("");
 
     } catch (error) {
-      console.error("ADD COMMENT ERROR:", error);
+      console.error(
+        "ADD COMMENT ERROR:",
+        error
+      );
 
       alert(
         error.response?.data?.message ||
         "Unable to add comment"
       );
+
     } finally {
       setCommentsLoading(false);
     }
   };
 
-  // ==========================================
+  // =====================================================
   // EDIT COMMENT
-  // ==========================================
+  // =====================================================
 
   const handleUpdateComment = async (
     commentId,
@@ -149,17 +213,18 @@ function VideoPlayer({ isSidebarOpen }) {
       const response = await axios.put(
         `${API_URL}/comments/${commentId}`,
         {
-          text
+          text,
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
       const updatedComment =
-        response.data.comment || response.data;
+        response.data.comment ||
+        response.data;
 
       setComments((prev) =>
         prev.map((comment) =>
@@ -186,9 +251,9 @@ function VideoPlayer({ isSidebarOpen }) {
     }
   };
 
-  // ==========================================
+  // =====================================================
   // DELETE COMMENT
-  // ==========================================
+  // =====================================================
 
   const handleDeleteComment = async (
     commentId
@@ -202,8 +267,8 @@ function VideoPlayer({ isSidebarOpen }) {
         `${API_URL}/comments/${commentId}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
@@ -227,24 +292,30 @@ function VideoPlayer({ isSidebarOpen }) {
     }
   };
 
-  // ==========================================
+  // =====================================================
   // LIKE
-  // ==========================================
+  // =====================================================
 
   const handleLike = async () => {
     if (!token) {
-      alert("Please sign in to like this video.");
+      alert(
+        "Please sign in to like this video."
+      );
+      return;
+    }
+
+    if (!videoId) {
       return;
     }
 
     try {
       const response = await axios.post(
-        `${API_URL}/videos/${id}/like`,
+        `${API_URL}/videos/${videoId}/like`,
         {},
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
@@ -252,11 +323,14 @@ function VideoPlayer({ isSidebarOpen }) {
         ...prev,
         likes:
           response.data.likes ??
-          prev.likes
+          prev.likes,
       }));
 
     } catch (error) {
-      console.error("LIKE ERROR:", error);
+      console.error(
+        "LIKE ERROR:",
+        error
+      );
 
       alert(
         error.response?.data?.message ||
@@ -265,9 +339,9 @@ function VideoPlayer({ isSidebarOpen }) {
     }
   };
 
-  // ==========================================
+  // =====================================================
   // DISLIKE
-  // ==========================================
+  // =====================================================
 
   const handleDislike = async () => {
     if (!token) {
@@ -277,14 +351,18 @@ function VideoPlayer({ isSidebarOpen }) {
       return;
     }
 
+    if (!videoId) {
+      return;
+    }
+
     try {
       const response = await axios.post(
-        `${API_URL}/videos/${id}/dislike`,
+        `${API_URL}/videos/${videoId}/dislike`,
         {},
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
@@ -292,7 +370,7 @@ function VideoPlayer({ isSidebarOpen }) {
         ...prev,
         dislikes:
           response.data.dislikes ??
-          prev.dislikes
+          prev.dislikes,
       }));
 
     } catch (error) {
@@ -308,17 +386,21 @@ function VideoPlayer({ isSidebarOpen }) {
     }
   };
 
-  // ==========================================
+  // =====================================================
   // SHARE
-  // ==========================================
+  // =====================================================
 
   const handleShare = async () => {
+    if (!video) {
+      return;
+    }
+
     try {
       if (navigator.share) {
         await navigator.share({
           title: video.title,
           text: video.description,
-          url: window.location.href
+          url: window.location.href,
         });
       } else {
         await navigator.clipboard.writeText(
@@ -332,9 +414,9 @@ function VideoPlayer({ isSidebarOpen }) {
     }
   };
 
-  // ==========================================
+  // =====================================================
   // LOADING
-  // ==========================================
+  // =====================================================
 
   if (loading) {
     return (
@@ -344,9 +426,9 @@ function VideoPlayer({ isSidebarOpen }) {
     );
   }
 
-  // ==========================================
+  // =====================================================
   // ERROR
-  // ==========================================
+  // =====================================================
 
   if (error || !video) {
     return (
@@ -358,22 +440,19 @@ function VideoPlayer({ isSidebarOpen }) {
     );
   }
 
-  // ==========================================
+  // =====================================================
   // RENDER
-  // ==========================================
+  // =====================================================
 
   return (
     <div
       className={`vc-watchpage ${
-        !isSidebarOpen ? "expanded" : ""
+        !isSidebarOpen
+          ? "expanded"
+          : ""
       }`}
     >
-
       <div className="vc-watch-layout">
-
-        {/* ================================= */}
-        {/* MAIN VIDEO SECTION */}
-        {/* ================================= */}
 
         <main className="vc-watch-main">
 
@@ -417,14 +496,15 @@ function VideoPlayer({ isSidebarOpen }) {
               <span> • </span>
 
               <span>
-                {formatDate(video.uploadDate)}
+                {formatDate(
+                  video.uploadDate ||
+                  video.createdAt
+                )}
               </span>
 
             </div>
 
-            {/* ================================= */}
             {/* CHANNEL */}
-            {/* ================================= */}
 
             <div className="vc-channel-section">
 
@@ -467,9 +547,7 @@ function VideoPlayer({ isSidebarOpen }) {
 
             </div>
 
-            {/* ================================= */}
-            {/* LIKE / DISLIKE */}
-            {/* ================================= */}
+            {/* LIKE / DISLIKE / SHARE */}
 
             <div className="vc-action-section">
 
@@ -480,7 +558,9 @@ function VideoPlayer({ isSidebarOpen }) {
                 <ThumbsUp size={20} />
 
                 {formatNumber(
-                  getReactionCount(video.likes)
+                  getReactionCount(
+                    video.likes
+                  )
                 )}
               </button>
 
@@ -508,9 +588,7 @@ function VideoPlayer({ isSidebarOpen }) {
 
             </div>
 
-            {/* ================================= */}
             {/* DESCRIPTION */}
-            {/* ================================= */}
 
             <div className="vc-description">
 
@@ -524,9 +602,7 @@ function VideoPlayer({ isSidebarOpen }) {
 
             </div>
 
-            {/* ================================= */}
             {/* COMMENTS */}
-            {/* ================================= */}
 
             <div className="vc-comments">
 
@@ -544,7 +620,8 @@ function VideoPlayer({ isSidebarOpen }) {
 
                     {user.username
                       ?.charAt(0)
-                      .toUpperCase() || "U"}
+                      .toUpperCase() ||
+                      "U"}
 
                   </div>
 
@@ -570,7 +647,9 @@ function VideoPlayer({ isSidebarOpen }) {
                     onClick={
                       handleAddComment
                     }
-                    disabled={commentsLoading}
+                    disabled={
+                      commentsLoading
+                    }
                   >
                     {commentsLoading
                       ? "Posting..."
@@ -623,17 +702,15 @@ function VideoPlayer({ isSidebarOpen }) {
         </main>
 
       </div>
-
     </div>
   );
 }
 
-/* ==========================================
-   HELPER FUNCTIONS
-========================================== */
+// =====================================================
+// HELPER FUNCTIONS
+// =====================================================
 
 function getChannelName(video) {
-
   if (
     video.channel &&
     typeof video.channel === "object"
@@ -651,7 +728,6 @@ function getChannelName(video) {
 }
 
 function getReactionCount(reaction) {
-
   if (Array.isArray(reaction)) {
     return reaction.length;
   }
@@ -660,7 +736,6 @@ function getReactionCount(reaction) {
 }
 
 function formatViews(views) {
-
   if (views >= 1000000) {
     return `${(
       views / 1000000
@@ -677,7 +752,6 @@ function formatViews(views) {
 }
 
 function formatNumber(number) {
-
   if (number >= 1000000) {
     return `${(
       number / 1000000
@@ -694,7 +768,6 @@ function formatNumber(number) {
 }
 
 function formatSubscribers(number) {
-
   if (number >= 1000000) {
     return `${(
       number / 1000000
@@ -711,10 +784,16 @@ function formatSubscribers(number) {
 }
 
 function formatDate(date) {
-
-  if (!date) return "";
+  if (!date) {
+    return "";
+  }
 
   const uploadDate = new Date(date);
+
+  if (Number.isNaN(uploadDate.getTime())) {
+    return "";
+  }
+
   const now = new Date();
 
   const difference = Math.floor(

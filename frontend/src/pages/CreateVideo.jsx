@@ -9,8 +9,8 @@ function CreateVideo() {
   const { user, token } = useAuth();
   const navigate = useNavigate();
 
-  const [channels, setChannels] = useState([]);
-  const [loadingChannels, setLoadingChannels] = useState(true);
+  const [channel, setChannel] = useState(null);
+  const [loadingChannel, setLoadingChannel] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
@@ -22,44 +22,23 @@ function CreateVideo() {
     channelId: "",
   });
 
-  // ==========================================
-  // GET USER CHANNEL
-  // ==========================================
+  // =====================================================
+  // GET MY CHANNEL
+  // GET /api/channels/my
+  // =====================================================
 
   useEffect(() => {
-    const fetchChannels = async () => {
+    const fetchMyChannel = async () => {
+      if (!token) {
+        setLoadingChannel(false);
+        return;
+      }
+
       try {
-        setLoadingChannels(true);
+        setLoadingChannel(true);
 
-        /*
-          If your user already contains channelId,
-          this will work immediately.
-        */
-        if (user?.channelId) {
-          setForm((prev) => ({
-            ...prev,
-            channelId: user.channelId,
-          }));
-
-          setChannels([
-            {
-              _id: user.channelId,
-              channelName:
-                user.channelName ||
-                `${user.username}'s Channel`,
-            },
-          ]);
-
-          return;
-        }
-
-        /*
-          If you don't have user.channelId yet,
-          use your backend /my-channel endpoint
-          after adding it.
-        */
         const response = await axios.get(
-          `${API_URL}/channels/my-channel`,
+          `${API_URL}/channels/my`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -67,39 +46,50 @@ function CreateVideo() {
           }
         );
 
-        const channel =
-          response.data.channel ||
-          response.data;
+        console.log("MY CHANNEL RESPONSE:", response.data);
 
-        setChannels([channel]);
+        const myChannel = response.data.channel;
+
+        if (!myChannel) {
+          setChannel(null);
+          setForm((prev) => ({
+            ...prev,
+            channelId: "",
+          }));
+
+          return;
+        }
+
+        setChannel(myChannel);
 
         setForm((prev) => ({
           ...prev,
-          channelId: channel._id,
+          channelId: myChannel._id,
         }));
+
       } catch (error) {
         console.error(
-          "GET CHANNEL ERROR:",
+          "GET MY CHANNEL ERROR:",
           error
         );
+
+        setChannel(null);
 
         alert(
           error.response?.data?.message ||
           "Unable to find your channel"
         );
       } finally {
-        setLoadingChannels(false);
+        setLoadingChannel(false);
       }
     };
 
-    if (user && token) {
-      fetchChannels();
-    }
-  }, [user, token]);
+    fetchMyChannel();
+  }, [token]);
 
-  // ==========================================
-  // HANDLE CHANGE
-  // ==========================================
+  // =====================================================
+  // HANDLE INPUT CHANGE
+  // =====================================================
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -110,9 +100,10 @@ function CreateVideo() {
     }));
   };
 
-  // ==========================================
+  // =====================================================
   // CREATE VIDEO
-  // ==========================================
+  // POST /api/videos
+  // =====================================================
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -122,16 +113,28 @@ function CreateVideo() {
       return;
     }
 
-    if (
-      !form.title.trim() ||
-      !form.videoUrl.trim() ||
-      !form.thumbnailUrl.trim() ||
-      !form.category.trim() ||
-      !form.channelId
-    ) {
-      alert(
-        "Please fill all required fields."
-      );
+    if (!channel?._id) {
+      alert("Please create a channel first.");
+      return;
+    }
+
+    if (!form.title.trim()) {
+      alert("Please enter video title.");
+      return;
+    }
+
+    if (!form.videoUrl.trim()) {
+      alert("Please enter video URL.");
+      return;
+    }
+
+    if (!form.thumbnailUrl.trim()) {
+      alert("Please enter thumbnail URL.");
+      return;
+    }
+
+    if (!form.category.trim()) {
+      alert("Please select a category.");
       return;
     }
 
@@ -146,11 +149,12 @@ function CreateVideo() {
           videoUrl: form.videoUrl.trim(),
           thumbnailUrl: form.thumbnailUrl.trim(),
           category: form.category.trim(),
-          channelId: form.channelId,
+          channelId: channel._id,
         },
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         }
       );
@@ -164,26 +168,33 @@ function CreateVideo() {
 
       // Go to channel page
       navigate("/channel");
+
     } catch (error) {
       console.error(
         "CREATE VIDEO ERROR:",
         error
       );
 
+      console.error(
+        "SERVER RESPONSE:",
+        error.response?.data
+      );
+
       alert(
         error.response?.data?.message ||
         "Unable to create video"
       );
+
     } finally {
       setSubmitting(false);
     }
   };
 
-  // ==========================================
+  // =====================================================
   // NOT LOGGED IN
-  // ==========================================
+  // =====================================================
 
-  if (!user) {
+  if (!user || !token) {
     return (
       <div className="p-6">
         <h2>
@@ -193,21 +204,53 @@ function CreateVideo() {
     );
   }
 
-  // ==========================================
-  // LOADING CHANNEL
-  // ==========================================
+  // =====================================================
+  // LOADING
+  // =====================================================
 
-  if (loadingChannels) {
+  if (loadingChannel) {
     return (
       <div className="p-6">
-        <h2>Loading channel...</h2>
+        <h2>Loading your channel...</h2>
       </div>
     );
   }
 
-  // ==========================================
+  // =====================================================
+  // NO CHANNEL
+  // =====================================================
+
+  if (!channel) {
+    return (
+      <div className="max-w-2xl mx-auto p-6">
+
+        <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
+
+          <h2 className="text-2xl font-bold mb-3">
+            Create a channel first
+          </h2>
+
+          <p className="text-gray-600 mb-6">
+            You need to create a channel before
+            you can upload videos.
+          </p>
+
+          <button
+            onClick={() => navigate("/create-channel")}
+            className="bg-black text-white px-6 py-3 rounded-full hover:bg-gray-800"
+          >
+            Create Channel
+          </button>
+
+        </div>
+
+      </div>
+    );
+  }
+
+  // =====================================================
   // RENDER
-  // ==========================================
+  // =====================================================
 
   return (
     <div className="max-w-3xl mx-auto p-6">
@@ -221,9 +264,28 @@ function CreateVideo() {
         className="bg-white rounded-2xl shadow-sm p-6 space-y-6"
       >
 
+        {/* ================================================= */}
+        {/* CHANNEL */}
+        {/* ================================================= */}
+
+        <div className="border rounded-xl p-4 bg-gray-50">
+
+          <p className="text-sm text-gray-500 mb-1">
+            Publishing to
+          </p>
+
+          <h2 className="font-semibold text-lg">
+            {channel.channelName}
+          </h2>
+
+        </div>
+
+        {/* ================================================= */}
         {/* TITLE */}
+        {/* ================================================= */}
 
         <div>
+
           <label className="block font-medium mb-2">
             Title
           </label>
@@ -237,11 +299,15 @@ function CreateVideo() {
             className="w-full border rounded-lg px-4 py-3"
             required
           />
+
         </div>
 
+        {/* ================================================= */}
         {/* DESCRIPTION */}
+        {/* ================================================= */}
 
         <div>
+
           <label className="block font-medium mb-2">
             Description
           </label>
@@ -254,11 +320,15 @@ function CreateVideo() {
             rows={5}
             className="w-full border rounded-lg px-4 py-3"
           />
+
         </div>
 
+        {/* ================================================= */}
         {/* VIDEO URL */}
+        {/* ================================================= */}
 
         <div>
+
           <label className="block font-medium mb-2">
             Video URL
           </label>
@@ -272,11 +342,19 @@ function CreateVideo() {
             className="w-full border rounded-lg px-4 py-3"
             required
           />
+
+          <p className="text-sm text-gray-500 mt-1">
+            Use a direct .mp4 video URL.
+          </p>
+
         </div>
 
+        {/* ================================================= */}
         {/* THUMBNAIL URL */}
+        {/* ================================================= */}
 
         <div>
+
           <label className="block font-medium mb-2">
             Thumbnail URL
           </label>
@@ -290,11 +368,19 @@ function CreateVideo() {
             className="w-full border rounded-lg px-4 py-3"
             required
           />
+
+          <p className="text-sm text-gray-500 mt-1">
+            Use a direct image URL such as .jpg, .jpeg or .png.
+          </p>
+
         </div>
 
+        {/* ================================================= */}
         {/* CATEGORY */}
+        {/* ================================================= */}
 
         <div>
+
           <label className="block font-medium mb-2">
             Category
           </label>
@@ -305,6 +391,7 @@ function CreateVideo() {
             onChange={handleChange}
             className="w-full border rounded-lg px-4 py-3"
           >
+
             <option value="React">
               React
             </option>
@@ -336,48 +423,29 @@ function CreateVideo() {
             <option value="Education">
               Education
             </option>
+
           </select>
+
         </div>
 
-        {/* CHANNEL */}
-
-        {channels.length > 0 && (
-          <div>
-            <label className="block font-medium mb-2">
-              Channel
-            </label>
-
-            <select
-              name="channelId"
-              value={form.channelId}
-              onChange={handleChange}
-              className="w-full border rounded-lg px-4 py-3"
-            >
-              {channels.map((channel) => (
-                <option
-                  key={channel._id}
-                  value={channel._id}
-                >
-                  {channel.channelName}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
+        {/* ================================================= */}
         {/* SUBMIT */}
+        {/* ================================================= */}
 
         <button
           type="submit"
-          disabled={submitting || !form.channelId}
+          disabled={submitting || !channel?._id}
           className="bg-black text-white px-6 py-3 rounded-full hover:bg-gray-800 disabled:opacity-50"
         >
+
           {submitting
             ? "Creating..."
             : "Create Video"}
+
         </button>
 
       </form>
+
     </div>
   );
 }

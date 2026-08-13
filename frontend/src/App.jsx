@@ -10,7 +10,7 @@ import VideoPlayer from "./pages/VideoPlayer.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Channel from "./pages/Channel.jsx";
-import CreateChannel from "./pages/CreateChannel";
+import CreateChannel from "./pages/CreateChannel.jsx";
 
 import { Routes, Route, useLocation } from "react-router-dom";
 
@@ -23,7 +23,6 @@ function App() {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  // Shared search state
   const [search, setSearch] = useState("");
 
   const toggleSidebar = () => {
@@ -32,6 +31,7 @@ function App() {
 
   return (
     <div className="vc-mainapp">
+
       <div className="vc-main">
 
         {/* HEADER */}
@@ -47,13 +47,18 @@ function App() {
 
           {/* SIDEBAR */}
           {!isAuthPage && (
-            <Sidebar isOpen={isSidebarOpen} />
+            <Sidebar
+              isOpen={isSidebarOpen}
+            />
           )}
 
           {/* ROUTES */}
           <Routes>
 
-            {/* HOME */}
+            {/* =========================
+                HOME
+            ========================= */}
+
             <Route
               path="/"
               element={
@@ -64,7 +69,10 @@ function App() {
               }
             />
 
-            {/* AUTH */}
+            {/* =========================
+                AUTH
+            ========================= */}
+
             <Route
               path="/login"
               element={<Login />}
@@ -75,7 +83,10 @@ function App() {
               element={<Register />}
             />
 
-            {/* CHANNEL */}
+            {/* =========================
+                CHANNEL
+            ========================= */}
+
             <Route
               path="/channel"
               element={
@@ -87,12 +98,27 @@ function App() {
               }
             />
 
-            {/* VIDEO PLAYER */}
-
-              <Route path="/create-channel" element={<CreateChannel isSidebarOpen={isSidebarOpen}  />} />
+            {/* =========================
+                CREATE CHANNEL
+            ========================= */}
 
             <Route
-              path="/video/:videoId"
+              path="/create-channel"
+              element={
+                <ProtectedRoute>
+                  <CreateChannel
+                    isSidebarOpen={isSidebarOpen}
+                  />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* =========================
+                VIDEO PLAYER
+            ========================= */}
+
+            <Route
+              path="/watch/:videoId"
               element={
                 <VideoPlayer
                   isSidebarOpen={isSidebarOpen}

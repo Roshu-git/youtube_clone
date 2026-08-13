@@ -2,18 +2,25 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 function VideoCard({ video }) {
-  // MongoDB ID
-  const videoId = video._id || video.videoId;
+  // ==========================================
+  // GET VIDEO ID
+  // ==========================================
 
-  // Channel can come from populated MongoDB channel object
+  const videoId = video?._id || video?.videoId;
+
+  // ==========================================
+  // CHANNEL NAME
+  // ==========================================
+
   const channelName =
-    video.channel?.channelName ||
-    video.channelName ||
+    video?.channel?.channelName ||
+    video?.channelName ||
     "Unknown Channel";
 
-  // ==============================
+  // ==========================================
   // FORMAT VIEWS
-  // ==============================
+  // ==========================================
+
   function formatViews(views = 0) {
     if (views >= 1000000) {
       return `${(views / 1000000).toFixed(1)}M views`;
@@ -26,15 +33,21 @@ function VideoCard({ video }) {
     return `${views} views`;
   }
 
-  // ==============================
-  // FORMAT UPLOAD DATE
-  // ==============================
+  // ==========================================
+  // FORMAT DATE
+  // ==========================================
+
   function formatDate(date) {
     if (!date) {
       return "";
     }
 
     const uploadDate = new Date(date);
+
+    if (Number.isNaN(uploadDate.getTime())) {
+      return "";
+    }
+
     const now = new Date();
 
     const difference = Math.floor(
@@ -65,54 +78,74 @@ function VideoCard({ video }) {
     )} years ago`;
   }
 
+  // ==========================================
+  // CHECK VIDEO ID
+  // ==========================================
+
+  if (!videoId) {
+    console.error("VIDEO CARD: VIDEO ID IS MISSING", video);
+
+    return null;
+  }
+
+  // ==========================================
+  // RENDER
+  // ==========================================
+
   return (
     <div className="vc-videocard">
 
       {/* =================================
           THUMBNAIL
       ================================= */}
+
       <Link
-        to={`/video/${videoId}`}
+        to={`/watch/${videoId}`}
         className="vc-thumbnail-wrapper"
       >
         <img
-          src={video.thumbnailUrl}
-          alt={video.title}
+          src={video?.thumbnailUrl}
+          alt={video?.title || "Video"}
           className="thumbnail"
           loading="lazy"
         />
 
         {/* Video duration */}
-        {video.duration && (
+
+        {video?.duration && (
           <span className="vc-duration">
             {video.duration}
           </span>
         )}
       </Link>
 
-
       {/* =================================
           VIDEO INFORMATION
       ================================= */}
+
       <div className="vc-videoinfo flex justify-between">
 
         <div className="vc-videoinfo-inner">
 
-          {/* Title */}
-          <Link to={`/video/${videoId}`}>
-            <h4>{video.title}</h4>
+          {/* TITLE */}
+
+          <Link to={`/watch/${videoId}`}>
+            <h4>
+              {video?.title || "Untitled Video"}
+            </h4>
           </Link>
 
+          {/* CHANNEL */}
 
-          {/* Channel */}
           <div className="vc-channel">
 
             <p>
               {channelName}
             </p>
 
-            {/* Verified channel */}
-            {video.channel?.verified && (
+            {/* VERIFIED CHANNEL */}
+
+            {video?.channel?.verified && (
               <span className="vc-verified">
                 ✓
               </span>
@@ -120,16 +153,20 @@ function VideoCard({ video }) {
 
           </div>
 
+          {/* VIEWS + DATE */}
 
-          {/* Views + Upload date */}
           <p className="vc-meta">
 
-            {formatViews(video.views)}
+            {formatViews(video?.views || 0)}
 
-            {video.uploadDate && (
+            {(video?.uploadDate ||
+              video?.createdAt) && (
               <>
                 {" • "}
-                {formatDate(video.uploadDate)}
+                {formatDate(
+                  video.uploadDate ||
+                  video.createdAt
+                )}
               </>
             )}
 
@@ -137,8 +174,8 @@ function VideoCard({ video }) {
 
         </div>
 
+        {/* THREE DOT MENU */}
 
-        {/* Three dot menu */}
         <div className="vc-video-dotbtn">
 
           <button

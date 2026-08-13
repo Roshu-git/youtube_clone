@@ -1,19 +1,36 @@
+import mongoose from "mongoose";
 import Comment from "../models/Comment.model.js";
 import Video from "../models/Video.model.js";
 
-// =============================
+// =====================================================
 // CREATE COMMENT
-// =============================
+// POST /api/comments
+// =====================================================
 export const createComment = async (req, res) => {
   try {
     const { videoId, text } = req.body;
 
-    if (!videoId || !text || !text.trim()) {
+    // Validate video ID
+    if (!videoId) {
       return res.status(400).json({
-        message: "Video ID and comment text are required",
+        message: "Video ID is required",
       });
     }
 
+    if (!mongoose.Types.ObjectId.isValid(videoId)) {
+      return res.status(400).json({
+        message: "Invalid video ID",
+      });
+    }
+
+    // Validate comment
+    if (!text || !text.trim()) {
+      return res.status(400).json({
+        message: "Comment text is required",
+      });
+    }
+
+    // Check video
     const video = await Video.findById(videoId);
 
     if (!video) {
@@ -22,12 +39,14 @@ export const createComment = async (req, res) => {
       });
     }
 
+    // Create comment
     const comment = await Comment.create({
       video: videoId,
       user: req.user.id,
       text: text.trim(),
     });
 
+    // Populate user
     const populatedComment = await Comment.findById(comment._id)
       .populate("user", "username avatar");
 
@@ -35,22 +54,54 @@ export const createComment = async (req, res) => {
       message: "Comment added successfully",
       comment: populatedComment,
     });
+
   } catch (error) {
     console.error("CREATE COMMENT ERROR:", error);
 
     return res.status(500).json({
       message: "Failed to add comment",
+      error: error.message,
     });
   }
 };
 
-// =============================
+
+// =====================================================
 // GET COMMENTS FOR VIDEO
-// =============================
+// GET /api/comments/video/:videoId
+// =====================================================
 export const getCommentsByVideo = async (req, res) => {
   try {
     const { videoId } = req.params;
 
+    console.log("GET COMMENTS VIDEO ID:", videoId);
+
+    // IMPORTANT: prevent Mongoose CastError
+    if (!videoId) {
+      return res.status(400).json({
+        message: "Video ID is missing",
+        comments: [],
+      });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(videoId)) {
+      return res.status(400).json({
+        message: "Invalid video ID",
+        comments: [],
+      });
+    }
+
+    // Check whether video exists
+    const video = await Video.findById(videoId);
+
+    if (!video) {
+      return res.status(404).json({
+        message: "Video not found",
+        comments: [],
+      });
+    }
+
+    // Get comments
     const comments = await Comment.find({
       video: videoId,
     })
@@ -61,22 +112,33 @@ export const getCommentsByVideo = async (req, res) => {
       count: comments.length,
       comments,
     });
+
   } catch (error) {
     console.error("GET COMMENTS ERROR:", error);
 
     return res.status(500).json({
       message: "Failed to fetch comments",
+      error: error.message,
+      comments: [],
     });
   }
 };
 
-// =============================
+
+// =====================================================
 // UPDATE COMMENT
-// =============================
+// PUT /api/comments/:commentId
+// =====================================================
 export const updateComment = async (req, res) => {
   try {
     const { commentId } = req.params;
     const { text } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(commentId)) {
+      return res.status(400).json({
+        message: "Invalid comment ID",
+      });
+    }
 
     if (!text || !text.trim()) {
       return res.status(400).json({
@@ -92,7 +154,7 @@ export const updateComment = async (req, res) => {
       });
     }
 
-    // Comment model uses "user", not "owner"
+    // Only comment owner can edit
     if (comment.user.toString() !== req.user.id) {
       return res.status(403).json({
         message: "You can only edit your own comments",
@@ -110,21 +172,31 @@ export const updateComment = async (req, res) => {
       message: "Comment updated successfully",
       comment: updatedComment,
     });
+
   } catch (error) {
     console.error("UPDATE COMMENT ERROR:", error);
 
     return res.status(500).json({
       message: "Failed to update comment",
+      error: error.message,
     });
   }
 };
 
-// =============================
+
+// =====================================================
 // DELETE COMMENT
-// =============================
+// DELETE /api/comments/:commentId
+// =====================================================
 export const deleteComment = async (req, res) => {
   try {
     const { commentId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(commentId)) {
+      return res.status(400).json({
+        message: "Invalid comment ID",
+      });
+    }
 
     const comment = await Comment.findById(commentId);
 
@@ -146,11 +218,13 @@ export const deleteComment = async (req, res) => {
     return res.status(200).json({
       message: "Comment deleted successfully",
     });
+
   } catch (error) {
     console.error("DELETE COMMENT ERROR:", error);
 
     return res.status(500).json({
       message: "Failed to delete comment",
+      error: error.message,
     });
   }
 };
