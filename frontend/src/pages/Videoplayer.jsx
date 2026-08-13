@@ -707,7 +707,6 @@ function VideoPlayer({ isSidebarOpen }) {
                   if (!recommendedId) {
                     return null;
                   }
-
                   return (
                     <Link
                       key={recommendedId}
