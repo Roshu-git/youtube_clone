@@ -22,7 +22,7 @@ function VideoCard({ video }) {
   console.log("VIDEO CARD DATA:", video);
   console.log("VIDEO CARD ID:", videoId);
 
-  // Do not create /video/undefined
+  // Do not create /watch/undefined
   if (!videoId) {
     console.error(
       "VIDEO CARD ERROR: Video ID is missing",
@@ -44,6 +44,7 @@ function VideoCard({ video }) {
 
   const channelName =
     video.channel?.channelName ||
+    video.channelId?.channelName ||
     video.channelName ||
     "Unknown Channel";
 
@@ -116,7 +117,7 @@ function VideoCard({ video }) {
       ================================= */}
 
       <Link
-        to={`/video/${videoId}`}
+        to={`/watch/${videoId}`}
         className="vc-thumbnail-wrapper"
       >
         <img
@@ -143,7 +144,7 @@ function VideoCard({ video }) {
 
           {/* TITLE */}
 
-          <Link to={`/video/${videoId}`}>
+          <Link to={`/watch/${videoId}`}>
             <h4>{video.title}</h4>
           </Link>
 

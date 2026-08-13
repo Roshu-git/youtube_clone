@@ -953,7 +953,7 @@ button.dotbtn {
 
 .vc-comment-actions button {
     border: none;
-    background: transparent;
+    /* background: transparent; */
     cursor: pointer;
 }
 
@@ -1414,6 +1414,26 @@ p.vc-nopost {
     color: #0f0f0f;
     text-align: center;
     padding: 20px 0;
+}
+.video-page-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 24px;
+  width: 100%;
+}
+
+.video-main-content {
+  min-width: 0;
+}
+
+.video-recommendations {
+  width: 100%;
+}
+
+@media (max-width: 1000px) {
+  .video-page-layout {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Channel CSS End */

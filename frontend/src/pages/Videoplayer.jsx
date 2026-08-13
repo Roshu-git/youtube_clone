@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import axios from "axios";
+
 import {
   ThumbsUp,
   ThumbsDown,
@@ -13,38 +14,28 @@ import Comment from "../Components/Comment";
 const API_URL = "http://localhost:5000/api";
 
 function VideoPlayer({ isSidebarOpen }) {
-  // IMPORTANT:
-  // App.jsx route must be: /watch/:videoId
   const { videoId } = useParams();
-
   const { user, token } = useAuth();
 
   const [video, setVideo] = useState(null);
   const [comments, setComments] = useState([]);
-
+  const [recommendedVideos, setRecommendedVideos] = useState([]);
   const [newComment, setNewComment] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [commentsLoading, setCommentsLoading] = useState(false);
+  const [recommendationsLoading, setRecommendationsLoading] =
+    useState(true);
   const [error, setError] = useState("");
 
   // =====================================================
-  // DEBUG VIDEO ID
-  // =====================================================
-
-  console.log("VIDEO ID FROM URL:", videoId);
-
-  // =====================================================
-  // GET VIDEO
+  // FETCH CURRENT VIDEO
   // =====================================================
 
   useEffect(() => {
     if (!videoId) {
-      console.error("VIDEO ID IS UNDEFINED");
-
       setError("Video ID is missing from the URL.");
       setLoading(false);
-
       return;
     }
 
@@ -53,30 +44,17 @@ function VideoPlayer({ isSidebarOpen }) {
         setLoading(true);
         setError("");
 
-        console.log(
-          "FETCHING VIDEO:",
-          `${API_URL}/videos/${videoId}`
-        );
-
         const response = await axios.get(
           `${API_URL}/videos/${videoId}`
         );
 
-        console.log("VIDEO RESPONSE:", response.data);
-
-        setVideo(
-          response.data.video || response.data
-        );
-
+        setVideo(response.data.video || response.data);
       } catch (error) {
-        console.error(
-          "FETCH VIDEO ERROR:",
-          error
-        );
+        console.error("FETCH VIDEO ERROR:", error);
 
         setError(
           error.response?.data?.message ||
-          "Unable to load video"
+            "Unable to load video"
         );
       } finally {
         setLoading(false);
@@ -87,52 +65,77 @@ function VideoPlayer({ isSidebarOpen }) {
   }, [videoId]);
 
   // =====================================================
-  // GET COMMENTS
+  // FETCH COMMENTS
   // =====================================================
 
   useEffect(() => {
-    if (!videoId) {
-      return;
-    }
+    if (!videoId) return;
 
     const fetchComments = async () => {
       try {
         setCommentsLoading(true);
 
-        console.log(
-          "FETCHING COMMENTS:",
-          `${API_URL}/comments/video/${videoId}`
-        );
-
         const response = await axios.get(
           `${API_URL}/comments/video/${videoId}`
         );
 
-        console.log(
-          "COMMENTS RESPONSE:",
-          response.data
-        );
-
-        setComments(
-          response.data.comments ||
-          response.data ||
-          []
-        );
-
+        setComments(response.data.comments || []);
       } catch (error) {
-        console.error(
-          "FETCH COMMENTS ERROR:",
-          error
-        );
-
+        console.error("FETCH COMMENTS ERROR:", error);
         setComments([]);
-
       } finally {
         setCommentsLoading(false);
       }
     };
 
     fetchComments();
+  }, [videoId]);
+
+  // =====================================================
+  // FETCH RECOMMENDED VIDEOS
+  // =====================================================
+
+  useEffect(() => {
+    if (!videoId) return;
+
+    const fetchRecommendedVideos = async () => {
+      try {
+        setRecommendationsLoading(true);
+
+        const response = await axios.get(
+          `${API_URL}/videos`
+        );
+
+        const videos =
+          response.data.videos ||
+          response.data ||
+          [];
+
+        const filteredVideos = videos.filter((item) => {
+          const id =
+            item._id ||
+            item.id ||
+            item.videoId;
+
+          return String(id) !== String(videoId);
+        });
+
+        setRecommendedVideos(
+          filteredVideos.slice(0, 10)
+        );
+      } catch (error) {
+        console.error(
+          "FETCH RECOMMENDED VIDEOS ERROR:",
+          error
+        );
+
+        setRecommendedVideos([]);
+      } finally {
+        setRecommendationsLoading(false);
+      }
+    };
+
+    fetchRecommendedVideos();
   }, [videoId]);
 
   // =====================================================
@@ -145,9 +148,7 @@ function VideoPlayer({ isSidebarOpen }) {
       return;
     }
 
-    if (!newComment.trim()) {
-      return;
-    }
+    if (!newComment.trim()) return;
 
     if (!videoId) {
       alert("Video ID is missing.");
@@ -160,7 +161,7 @@ function VideoPlayer({ isSidebarOpen }) {
       const response = await axios.post(
         `${API_URL}/comments`,
         {
-          videoId: videoId,
+          videoId,
           text: newComment.trim(),
         },
         {
@@ -180,41 +181,32 @@ function VideoPlayer({ isSidebarOpen }) {
       ]);
 
       setNewComment("");
-
     } catch (error) {
-      console.error(
-        "ADD COMMENT ERROR:",
-        error
-      );
+      console.error("ADD COMMENT ERROR:", error);
 
       alert(
         error.response?.data?.message ||
-        "Unable to add comment"
+          "Unable to add comment"
       );
-
     } finally {
       setCommentsLoading(false);
     }
   };
 
   // =====================================================
-  // EDIT COMMENT
+  // UPDATE COMMENT
   // =====================================================
 
   const handleUpdateComment = async (
     commentId,
     text
   ) => {
-    if (!token) {
-      return false;
-    }
+    if (!token) return false;
 
     try {
       const response = await axios.put(
         `${API_URL}/comments/${commentId}`,
-        {
-          text,
-        },
+        { text },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -235,7 +227,6 @@ function VideoPlayer({ isSidebarOpen }) {
       );
 
       return true;
-
     } catch (error) {
       console.error(
         "UPDATE COMMENT ERROR:",
@@ -244,7 +235,7 @@ function VideoPlayer({ isSidebarOpen }) {
 
       alert(
         error.response?.data?.message ||
-        "Unable to update comment"
+          "Unable to update comment"
       );
 
       return false;
@@ -258,9 +249,7 @@ function VideoPlayer({ isSidebarOpen }) {
   const handleDeleteComment = async (
     commentId
   ) => {
-    if (!token) {
-      return;
-    }
+    if (!token) return;
 
     try {
       await axios.delete(
@@ -278,7 +267,6 @@ function VideoPlayer({ isSidebarOpen }) {
             comment._id !== commentId
         )
       );
-
     } catch (error) {
       console.error(
         "DELETE COMMENT ERROR:",
@@ -287,7 +275,7 @@ function VideoPlayer({ isSidebarOpen }) {
 
       alert(
         error.response?.data?.message ||
-        "Unable to delete comment"
+          "Unable to delete comment"
       );
     }
   };
@@ -298,13 +286,7 @@ function VideoPlayer({ isSidebarOpen }) {
 
   const handleLike = async () => {
     if (!token) {
-      alert(
-        "Please sign in to like this video."
-      );
-      return;
-    }
-
-    if (!videoId) {
+      alert("Please sign in to like this video.");
       return;
     }
 
@@ -324,17 +306,16 @@ function VideoPlayer({ isSidebarOpen }) {
         likes:
           response.data.likes ??
           prev.likes,
+        dislikes:
+          response.data.dislikes ??
+          prev.dislikes,
       }));
-
     } catch (error) {
-      console.error(
-        "LIKE ERROR:",
-        error
-      );
+      console.error("LIKE ERROR:", error);
 
       alert(
         error.response?.data?.message ||
-        "Unable to like video"
+          "Unable to like video"
       );
     }
   };
@@ -351,10 +332,6 @@ function VideoPlayer({ isSidebarOpen }) {
       return;
     }
 
-    if (!videoId) {
-      return;
-    }
-
     try {
       const response = await axios.post(
         `${API_URL}/videos/${videoId}/dislike`,
@@ -368,11 +345,13 @@ function VideoPlayer({ isSidebarOpen }) {
 
       setVideo((prev) => ({
         ...prev,
+        likes:
+          response.data.likes ??
+          prev.likes,
         dislikes:
           response.data.dislikes ??
           prev.dislikes,
       }));
-
     } catch (error) {
       console.error(
         "DISLIKE ERROR:",
@@ -381,7 +360,7 @@ function VideoPlayer({ isSidebarOpen }) {
 
       alert(
         error.response?.data?.message ||
-        "Unable to dislike video"
+          "Unable to dislike video"
       );
     }
   };
@@ -391,9 +370,7 @@ function VideoPlayer({ isSidebarOpen }) {
   // =====================================================
 
   const handleShare = async () => {
-    if (!video) {
-      return;
-    }
+    if (!video) return;
 
     try {
       if (navigator.share) {
@@ -409,7 +386,7 @@ function VideoPlayer({ isSidebarOpen }) {
 
         alert("Video link copied!");
       }
-    } catch (error) {
+    } catch {
       console.log("Share cancelled");
     }
   };
@@ -447,22 +424,21 @@ function VideoPlayer({ isSidebarOpen }) {
   return (
     <div
       className={`vc-watchpage ${
-        !isSidebarOpen
-          ? "expanded"
-          : ""
+        !isSidebarOpen ? "expanded" : ""
       }`}
     >
       <div className="vc-watch-layout">
 
+        {/* =================================================
+            LEFT COLUMN
+        ================================================= */}
+
         <main className="vc-watch-main">
 
-          {/* VIDEO PLAYER */}
-
+          {/* VIDEO */}
           <div className="vc-player">
-
             <video
               controls
-              width="100%"
               poster={video.thumbnailUrl}
               className="vc-video-element"
             >
@@ -474,8 +450,9 @@ function VideoPlayer({ isSidebarOpen }) {
               Your browser does not support
               the video tag.
             </video>
-
           </div>
+
+          {/* VIDEO INFORMATION */}
 
           <div className="vc-playeritem">
 
@@ -485,59 +462,43 @@ function VideoPlayer({ isSidebarOpen }) {
               {video.title}
             </h1>
 
-            {/* VIEWS + DATE */}
+            {/* CHANNEL + ACTIONS */}
 
-            <div className="vc-watch-meta">
+            <div className="vc-video-info-row">
 
-              <span>
-                {formatViews(video.views)}
-              </span>
+              {/* CHANNEL */}
 
-              <span> • </span>
+              <div className="vc-channel-section">
 
-              <span>
-                {formatDate(
-                  video.uploadDate ||
-                  video.createdAt
-                )}
-              </span>
+                <div className="vc-channel-left">
 
-            </div>
+                  <div className="vc-watch-channel-logo">
+                    {getChannelName(video)
+                      .charAt(0)
+                      .toUpperCase()}
+                  </div>
 
-            {/* CHANNEL */}
+                  <div className="vc-channel-details">
 
-            <div className="vc-channel-section">
+                    <h3>
+                      {getChannelName(video)}
+                    </h3>
 
-              <div className="vc-channel-left">
+                    <p>
+                      {formatSubscribers(
+                        video.channelId
+                          ?.subscribers ||
+                          video.channel
+                            ?.subscribers ||
+                          video.subscribers ||
+                          0
+                      )}{" "}
+                      subscribers
+                    </p>
 
-                <div className="vc-watch-channel-logo">
-
-                  {getChannelName(video)
-                    .charAt(0)
-                    .toUpperCase()}
-
-                </div>
-
-                <div className="vc-channel-details">
-
-                  <h3>
-                    {getChannelName(video)}
-                  </h3>
-
-                  <p>
-                    {formatSubscribers(
-                      video.channel?.subscribers ||
-                      video.subscribers ||
-                      0
-                    )}{" "}
-                    subscribers
-                  </p>
+                  </div>
 
                 </div>
-
-              </div>
-
-              <div className="vc-channel-actions">
 
                 <button className="vc-subscribe-btn">
                   Subscribe
@@ -547,43 +508,47 @@ function VideoPlayer({ isSidebarOpen }) {
 
             </div>
 
-            {/* LIKE / DISLIKE / SHARE */}
+            {/* ACTION BUTTONS */}
 
             <div className="vc-action-section">
 
               <button
-                className="flex items-center gap-2"
+                type="button"
                 onClick={handleLike}
               >
                 <ThumbsUp size={20} />
 
-                {formatNumber(
-                  getReactionCount(
-                    video.likes
-                  )
-                )}
+                <span>
+                  {formatNumber(
+                    getReactionCount(
+                      video.likes
+                    )
+                  )}
+                </span>
               </button>
 
               <button
-                className="flex items-center gap-2"
+                type="button"
                 onClick={handleDislike}
               >
                 <ThumbsDown size={20} />
 
-                {formatNumber(
-                  getReactionCount(
-                    video.dislikes
-                  )
-                )}
+                <span>
+                  {formatNumber(
+                    getReactionCount(
+                      video.dislikes
+                    )
+                  )}
+                </span>
               </button>
 
               <button
-                className="sharebtn flex items-center gap-2"
+                type="button"
+                className="sharebtn"
                 onClick={handleShare}
               >
                 <Share2 size={20} />
-
-                Share
+                <span>Share</span>
               </button>
 
             </div>
@@ -592,17 +557,25 @@ function VideoPlayer({ isSidebarOpen }) {
 
             <div className="vc-description">
 
-              <strong>
+              <div className="vc-description-meta">
                 {formatViews(video.views)}
-              </strong>
+                {" • "}
+                {formatDate(
+                  video.uploadDate ||
+                    video.createdAt
+                )}
+              </div>
 
               <p>
-                {video.description}
+                {video.description ||
+                  "No description available."}
               </p>
 
             </div>
 
-            {/* COMMENTS */}
+            {/* =================================================
+                COMMENTS
+            ================================================= */}
 
             <div className="vc-comments">
 
@@ -610,19 +583,14 @@ function VideoPlayer({ isSidebarOpen }) {
                 {comments.length} Comments
               </h2>
 
-              {/* ADD COMMENT */}
-
               {user ? (
-
                 <div className="vc-add-comment">
 
                   <div className="vc-user-avatar">
-
                     {user.username
                       ?.charAt(0)
                       .toUpperCase() ||
                       "U"}
-
                   </div>
 
                   <input
@@ -644,6 +612,7 @@ function VideoPlayer({ isSidebarOpen }) {
                   />
 
                   <button
+                    type="button"
                     onClick={
                       handleAddComment
                     }
@@ -657,42 +626,47 @@ function VideoPlayer({ isSidebarOpen }) {
                   </button>
 
                 </div>
-
               ) : (
-
                 <p>
                   Please sign in to add a
                   comment.
                 </p>
-
               )}
 
-              {/* COMMENT LIST */}
+              {commentsLoading &&
+                comments.length === 0 && (
+                  <p>
+                    Loading comments...
+                  </p>
+                )}
 
-              {comments.length === 0 ? (
+              {!commentsLoading &&
+                comments.length === 0 && (
+                  <p>
+                    No comments yet. Be the
+                    first to comment!
+                  </p>
+                )}
 
-                <p>
-                  No comments yet. Be the
-                  first to comment!
-                </p>
+              {comments.length > 0 && (
+                <div className="vc-comment-list">
 
-              ) : (
+                  {comments.map(
+                    (comment) => (
+                      <Comment
+                        key={comment._id}
+                        comment={comment}
+                        onUpdate={
+                          handleUpdateComment
+                        }
+                        onDelete={
+                          handleDeleteComment
+                        }
+                      />
+                    )
+                  )}
 
-                comments.map((comment) => (
-
-                  <Comment
-                    key={comment._id}
-                    comment={comment}
-                    onUpdate={
-                      handleUpdateComment
-                    }
-                    onDelete={
-                      handleDeleteComment
-                    }
-                  />
-
-                ))
-
+                </div>
               )}
 
             </div>
@@ -701,16 +675,135 @@ function VideoPlayer({ isSidebarOpen }) {
 
         </main>
 
+        {/* =================================================
+            RIGHT COLUMN
+        ================================================= */}
+
+        <aside className="vc-recommended">
+
+          <h2 className="vc-recommended-title">
+            Recommended
+          </h2>
+
+          {recommendationsLoading ? (
+            <div className="vc-recommended-loading">
+              Loading videos...
+            </div>
+          ) : recommendedVideos.length === 0 ? (
+            <div className="vc-recommended-loading">
+              No recommended videos
+            </div>
+          ) : (
+            <div className="vc-recommended-list">
+
+              {recommendedVideos.map(
+                (recommendedVideo) => {
+
+                  const recommendedId =
+                    recommendedVideo._id ||
+                    recommendedVideo.id ||
+                    recommendedVideo.videoId;
+
+                  if (!recommendedId) {
+                    return null;
+                  }
+
+                  return (
+                    <Link
+                      key={recommendedId}
+                      to={`/watch/${recommendedId}`}
+                      className="vc-recommended-card"
+                    >
+
+                      {/* RECOMMENDED THUMBNAIL */}
+
+                      <div className="vc-recommended-thumbnail-wrapper">
+
+                        <img
+                          src={
+                            recommendedVideo.thumbnailUrl
+                          }
+                          alt={
+                            recommendedVideo.title ||
+                            "Video"
+                          }
+                          className="vc-recommended-thumbnail"
+                          loading="lazy"
+                        />
+
+                        {recommendedVideo.duration && (
+                          <span className="vc-recommended-duration">
+                            {
+                              recommendedVideo.duration
+                            }
+                          </span>
+                        )}
+
+                      </div>
+
+                      {/* RECOMMENDED INFO */}
+
+                      <div className="vc-recommended-info">
+
+                        <h3>
+                          {
+                            recommendedVideo.title
+                          }
+                        </h3>
+
+                        <p className="vc-recommended-channel">
+                          {getChannelName(
+                            recommendedVideo
+                          )}
+                        </p>
+
+                        <p className="vc-recommended-meta">
+
+                          {formatViews(
+                            recommendedVideo.views
+                          )}
+
+                          {" • "}
+
+                          {formatDate(
+                            recommendedVideo.uploadDate ||
+                              recommendedVideo.createdAt
+                          )}
+
+                        </p>
+
+                      </div>
+
+                    </Link>
+                  );
+                }
+              )}
+
+            </div>
+          )}
+
+        </aside>
+
       </div>
     </div>
   );
 }
 
 // =====================================================
-// HELPER FUNCTIONS
+// CHANNEL NAME
 // =====================================================
 
 function getChannelName(video) {
+  if (
+    video.channelId &&
+    typeof video.channelId === "object"
+  ) {
+    return (
+      video.channelId.channelName ||
+      "Unknown Channel"
+    );
+  }
+
   if (
     video.channel &&
     typeof video.channel === "object"
@@ -727,6 +820,10 @@ function getChannelName(video) {
   );
 }
 
+// =====================================================
+// REACTION COUNT
+// =====================================================
+
 function getReactionCount(reaction) {
   if (Array.isArray(reaction)) {
     return reaction.length;
@@ -735,58 +832,60 @@ function getReactionCount(reaction) {
   return reaction || 0;
 }
 
-function formatViews(views) {
+// =====================================================
+// FORMAT VIEWS
+// =====================================================
+
+function formatViews(views = 0) {
   if (views >= 1000000) {
-    return `${(
-      views / 1000000
-    ).toFixed(1)}M views`;
+    return `${(views / 1000000).toFixed(1)}M views`;
   }
 
   if (views >= 1000) {
-    return `${(
-      views / 1000
-    ).toFixed(1)}K views`;
+    return `${(views / 1000).toFixed(1)}K views`;
   }
 
-  return `${views || 0} views`;
+  return `${views} views`;
 }
 
-function formatNumber(number) {
+// =====================================================
+// FORMAT NUMBER
+// =====================================================
+
+function formatNumber(number = 0) {
   if (number >= 1000000) {
-    return `${(
-      number / 1000000
-    ).toFixed(1)}M`;
+    return `${(number / 1000000).toFixed(1)}M`;
   }
 
   if (number >= 1000) {
-    return `${(
-      number / 1000
-    ).toFixed(1)}K`;
+    return `${(number / 1000).toFixed(1)}K`;
   }
 
   return number;
 }
 
-function formatSubscribers(number) {
+// =====================================================
+// FORMAT SUBSCRIBERS
+// =====================================================
+
+function formatSubscribers(number = 0) {
   if (number >= 1000000) {
-    return `${(
-      number / 1000000
-    ).toFixed(1)}M`;
+    return `${(number / 1000000).toFixed(1)}M`;
   }
 
   if (number >= 1000) {
-    return `${(
-      number / 1000
-    ).toFixed(1)}K`;
+    return `${(number / 1000).toFixed(1)}K`;
   }
 
   return number;
 }
+
+// =====================================================
+// FORMAT DATE
+// =====================================================
 
 function formatDate(date) {
-  if (!date) {
-    return "";
-  }
+  if (!date) return "";
 
   const uploadDate = new Date(date);
 
@@ -801,7 +900,7 @@ function formatDate(date) {
       (1000 * 60 * 60 * 24)
   );
 
-  if (difference === 0) {
+  if (difference <= 0) {
     return "Today";
   }
 
