@@ -150,7 +150,7 @@ function VideoPlayer({ isSidebarOpen }) {
     });
   }}>
                     <Share2 size={20} /> Share</button>
-                <button>⋮</button>
+                <button className="dotbtn">⋮</button>
 
               </div>
           </div>

@@ -25,6 +25,9 @@ export function AuthProvider({ children }) {
   // Login
   const login = (userData, userToken) => {
 
+    // Ensure hasChannel exists 
+    const updatedUser = { ...userData, hasChannel: userData.hasChannel ?? false };
+    
     localStorage.setItem("token", userToken);
 
     localStorage.setItem(

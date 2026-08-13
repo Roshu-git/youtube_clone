@@ -95,10 +95,10 @@ function Register() {
 
       <div className="signin-card">
 
-        <h1>Create your account</h1>
+        <h1>Hello ! Welcome</h1>
 
         <p>
-          Register to continue to YouTube Clone
+          Please Signup To Create Your Account.
         </p>
 
         <form onSubmit={handleSubmit}>

@@ -77,10 +77,10 @@ function Login() {
 
       <div className="signin-card">
 
-        <h1>Sign in</h1>
+        <h1>Welcome, Sign-in here</h1>
 
         <p>
-          Sign in to continue to YouTube Clone
+          Sign in to continue
         </p>
 
         <form onSubmit={handleSubmit}>

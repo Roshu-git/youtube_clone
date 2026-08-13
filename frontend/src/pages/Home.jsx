@@ -3,9 +3,8 @@ import videos from '../data/videos.js'
 import VideoCard from '../Components/VideoCard'
 import FilterBar from '../Components/FilterBar.jsx';
 
-// function Home({ toggleSidebar, isSidebarOpen }) {
 function Home({ isSidebarOpen, search }) {
-    // const [search, setSearch] =useState('');
+
     const [category, setCategory] = useState('All');
 
     // Combine search and filter 
@@ -28,20 +27,20 @@ function Home({ isSidebarOpen, search }) {
             <main className='vc-home'>
                 <FilterBar category={category} setCategory={setCategory}    />
 
+                    {filteredVideos.length > 0 ? ( 
                 <div className='vc-videogrid'>
-                    {filteredVideos.length > 0 ? (
-                    (filteredVideos.map((video) => ( <VideoCard key={video.videoId} video={video} /> ))
-                    )
-            ) : (
+                        {filteredVideos.map((video) => ( <VideoCard key={video.videoId} video={video} /> ))}
+                        </div>
+                    ) : (
                     <div className="no-videos">
-                    <h3>No videos found</h3>
-                    <p>Try another search or category.</p>
-                </div>
-            )}
+                        <h3>No videos found</h3>
+                        <p>Try another search or category.</p>
+                    </div>
+                    )}
                     {/* {videos.map((video)=>(
                         <VideoCard key={video.videoId} video={video} />
                     ))} */}
-                </div>
+                
             </main>
         </div>
     )
